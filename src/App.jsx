@@ -431,12 +431,70 @@ function toApexBarWidth(apexWeeks, manualWeeks) {
 
 function CantinaLogo() {
   return (
-    <img
-      src={cantinaLogomark}
-      alt="Cantina logo"
-      className="h-8 w-8 sm:h-9 sm:w-9"
-      loading="eager"
-    />
+    <span className="flex items-center gap-2.5">
+      <img
+        src={cantinaLogomark}
+        alt="Cantina logo"
+        className="h-8 w-8"
+        loading="eager"
+      />
+      <span className="text-base font-semibold text-gray-900">Cantina</span>
+    </span>
+  );
+}
+
+function FloatingNavbar() {
+  return (
+    <div className="fixed inset-x-0 top-4 z-50 px-3 sm:px-6">
+      <nav className="mx-auto h-16 w-full max-w-5xl rounded-full border border-white/20 bg-white/70 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl">
+        <div className="relative flex h-full items-center justify-between px-4 sm:px-6">
+          <a
+            href="/"
+            className="flex items-center transition-all duration-300 hover:opacity-80"
+          >
+            <CantinaLogo />
+          </a>
+
+          <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
+            <a
+              href="https://cantina.xyz/solutions/code-analyzer/enterprise"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-all duration-300"
+            >
+              Apex
+            </a>
+            <a
+              href="#"
+              className="px-3 py-1 text-sm font-medium text-gray-500 transition-all duration-300 hover:text-gray-900"
+            >
+              Services
+            </a>
+            <a
+              href="#"
+              className="px-3 py-1 text-sm font-medium text-gray-500 transition-all duration-300 hover:text-gray-900"
+            >
+              Resources
+            </a>
+          </div>
+
+          <div className="ml-auto flex items-center gap-3">
+            <a
+              href="#"
+              className="hidden text-sm font-medium text-gray-600 transition-all duration-300 hover:text-black sm:inline-flex"
+            >
+              Login
+            </a>
+            <a
+              href="#"
+              className="shimmer-button inline-flex items-center rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-black"
+            >
+              <span className="relative z-10">Book Audit</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
   );
 }
 
@@ -606,13 +664,9 @@ export default function App() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 opacity-5 [background-image:radial-gradient(#7b3515_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
       <div className="pointer-events-none absolute -right-32 -top-44 h-[34rem] w-[34rem] rounded-full bg-gradient-to-tr from-[#FF6B35]/10 to-transparent blur-3xl" />
 
-      <header className="relative z-10 border-b border-[#F1EAE7] bg-white/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
-          <CantinaLogo />
-        </div>
-      </header>
+      <FloatingNavbar />
 
-      <main className="relative z-10 mx-auto w-full max-w-4xl px-6 pb-20 pt-14">
+      <main className="relative z-10 mx-auto w-full max-w-4xl px-6 pb-20 pt-32 md:pt-36">
         <section className="mx-auto max-w-3xl text-center">
           <div className="mb-4">
             <span className="inline-flex items-center rounded-full bg-[#E87C40]/10 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#CB5626]">
