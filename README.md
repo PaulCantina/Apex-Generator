@@ -10,7 +10,7 @@ A landing-page calculator that estimates security review time and time saved usi
    - Rust
    - C/C++
    - Other
-3. Estimates baseline security review effort and calendar time
+3. Estimates baseline security review effort in weeks
 4. Estimates an Apex-assisted timeline with a fixed **0.2 week (~1 day) buffer**
 
 ## What it does not do
@@ -21,9 +21,9 @@ A landing-page calculator that estimates security review time and time saved usi
 
 ## Assumptions
 
-- Solidity: `1000 LOC ≈ 1 reviewer-week`
-- Rust + C/C++: `1500 LOC ≈ 1 reviewer-week`
-- Other: `2000 LOC ≈ 1 reviewer-week`
+- Solidity: `1000 LOC ≈ 1 week`
+- Rust + C/C++: `1500 LOC ≈ 1 week`
+- Other: `2000 LOC ≈ 1 week`
 - Complexity multiplier starts at `1.0` and is applied to baseline effort:
   - Final estimated weeks = Base weeks × Complexity multiplier
 - Complexity penalties/discounts:
@@ -56,11 +56,6 @@ Results show:
 - Raw LOC scanned
 - Excluded LOC
 - Effective LOC used in estimation
-
-## Reviewer team guidance
-
-- Typical team size: **2-4 reviewers** (usually budget dependent)
-- If effective in-scope LOC is under **300**, the UI suggests a **solo review** option
 
 ## Run locally
 

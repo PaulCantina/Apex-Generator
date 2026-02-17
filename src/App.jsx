@@ -4,7 +4,6 @@ import {
   GitBranch,
   Github,
   KeyRound,
-  Users,
 } from "lucide-react";
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
@@ -155,7 +154,6 @@ const DEFAULT_GENERATED_VENDOR_DIRS = new Set([
   "coverage",
 ]);
 
-const SOLO_REVIEW_MAX_LOC = 300;
 
 function createAppError(code, message) {
   const error = new Error(message);
@@ -733,44 +731,40 @@ async function getLocBreakdown(
   };
 }
 
-function calculateEstimates(locBreakdown, reviewers, mode, complexityMultiplier = 1.0) {
+function calculateEstimates(locBreakdown, mode, complexityMultiplier = 1.0) {
   const totalLoc =
     locBreakdown.solidity +
     locBreakdown.rust +
     locBreakdown.ccpp +
     locBreakdown.other;
 
-  const baseReviewerWeeks =
+  const baseWeeks =
     locBreakdown.solidity / 1000 +
     (locBreakdown.rust + locBreakdown.ccpp) / 1500 +
     locBreakdown.other / 2000;
-  const baselineReviewerWeeks = baseReviewerWeeks * complexityMultiplier;
-  const manualWeeks = baselineReviewerWeeks / reviewers;
+  const baselineWeeks = baseWeeks * complexityMultiplier;
 
   const selectedTier = MODE_REDUCTION[mode] ?? MODE_REDUCTION.standard;
-  const timeSaved = manualWeeks * selectedTier;
-  const apexCalendarWeeks = manualWeeks - timeSaved + APEX_BUFFER_WEEKS;
-  const apexManualReviewerWeeks = baselineReviewerWeeks * (1 - selectedTier);
+  const timeSaved = baselineWeeks * selectedTier;
+  const apexWeeks = baselineWeeks - timeSaved + APEX_BUFFER_WEEKS;
 
-  const reviewerWeeksSaved = baselineReviewerWeeks - apexManualReviewerWeeks;
-  const calendarWeeksSaved = manualWeeks - apexCalendarWeeks;
+  const weeksSaved = baselineWeeks - apexWeeks;
   const percentSaved =
-    manualWeeks > 0
-      ? Math.max((calendarWeeksSaved / manualWeeks) * 100, 0)
+    baselineWeeks > 0
+      ? Math.max((weeksSaved / baselineWeeks) * 100, 0)
       : 0;
 
   return {
     totalLoc,
-    baseReviewerWeeks,
+    baseWeeks,
     complexityMultiplier,
-    baselineReviewerWeeks,
-    baselineCalendarWeeks: manualWeeks,
-    manualWeeks,
+    baselineWeeks,
+    baselineCalendarWeeks: baselineWeeks,
     timeSaved,
-    apexManualReviewerWeeks,
-    apexCalendarWeeks,
-    reviewerWeeksSaved,
-    calendarWeeksSaved,
+    apexWeeks,
+    apexCalendarWeeks: apexWeeks,
+    weeksSaved,
+    calendarWeeksSaved: weeksSaved,
     percentSaved,
   };
 }
@@ -798,34 +792,6 @@ function weekLabel(weeks) {
 function formatModifierImpact(impact) {
   const sign = impact >= 0 ? "+" : "";
   return `${sign}${impact.toFixed(2)}`;
-}
-
-function getReviewerRecommendation(effectiveLoc, selectedReviewers) {
-  if (effectiveLoc < SOLO_REVIEW_MAX_LOC) {
-    return {
-      text: "Suggested team: 1 reviewer (solo), since in-scope LOC is below 300.",
-      tone: "recommend",
-    };
-  }
-
-  if (selectedReviewers < 2) {
-    return {
-      text: "Typical team size is 2-4 reviewers for this scope; consider increasing coverage.",
-      tone: "warning",
-    };
-  }
-
-  if (selectedReviewers > 4) {
-    return {
-      text: "Typical team size is 2-4 reviewers; higher staffing may reduce calendar time but increase reviewer-weeks.",
-      tone: "warning",
-    };
-  }
-
-  return {
-    text: "Suggested team size: 2-4 reviewers (depends mostly on client budget).",
-    tone: "default",
-  };
 }
 
 function toApexBarWidth(apexWeeks, manualWeeks) {
@@ -941,7 +907,6 @@ export default function App() {
   const [includePathsInput, setIncludePathsInput] = useState("");
   const [excludePathsInput, setExcludePathsInput] = useState("");
   const [smartContractOnly, setSmartContractOnly] = useState(false);
-  const [reviewers, setReviewers] = useState(2);
   const [mode, setMode] = useState("standard");
   const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
   const [statusMessage, setStatusMessage] = useState(
@@ -969,17 +934,6 @@ export default function App() {
       MODE_SELECTION_CARDS[1],
     [mode],
   );
-
-  const reviewerRecommendation = useMemo(() => {
-    const effectiveLoc = result?.scopeSummary?.effectiveTotalLoc;
-    if (typeof effectiveLoc !== "number") {
-      return {
-        text: "Typical team size is 2-4 reviewers. For very small scopes (<300 LOC), a solo review can be considered.",
-        tone: "default",
-      };
-    }
-    return getReviewerRecommendation(effectiveLoc, Number(reviewers));
-  }, [result, reviewers]);
 
   useEffect(() => {
     let frameOne;
@@ -1031,17 +985,6 @@ export default function App() {
       return;
     }
 
-    const reviewerCount = Number(reviewers);
-    if (!Number.isFinite(reviewerCount) || reviewerCount < 1) {
-      const message = "Reviewer count must be at least 1.";
-      setStatusMessage(message);
-      setBanner({
-        tone: "warning",
-        message,
-      });
-      return;
-    }
-
     setIsLoading(true);
     setStatusMessage("Fetching repository metadata...");
     const authToken = githubToken.trim();
@@ -1076,7 +1019,6 @@ export default function App() {
 
       const estimates = calculateEstimates(
         locData.breakdown,
-        Math.max(1, Math.round(reviewerCount)),
         mode,
         locData.complexity?.multiplier ?? 1.0,
       );
@@ -1221,31 +1163,6 @@ export default function App() {
             </div>
 
             <div>
-              <label
-                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
-                htmlFor="reviewers"
-              >
-                Reviewers
-              </label>
-              <div className="relative">
-                <Users className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="reviewers"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={reviewers}
-                  onChange={(event) => setReviewers(event.target.value)}
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
-                />
-              </div>
-              <p className="mt-1.5 text-xs text-[#8A786F]">
-                Typical teams use 2-4 reviewers. For scopes under 300 LOC, a
-                solo review can be appropriate.
-              </p>
-            </div>
-
-            <div>
               <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 Manual reduction mode
               </p>
@@ -1373,18 +1290,6 @@ export default function App() {
 
           {result && (
             <div className="mt-8 border-t border-[#F1EAE6] pt-8">
-              <div
-                className={`mb-4 rounded-lg border px-4 py-3 text-sm ${
-                  reviewerRecommendation.tone === "recommend"
-                    ? "border-[#E4C9B9] bg-[#FFF7F1] text-[#7D4D32]"
-                    : reviewerRecommendation.tone === "warning"
-                      ? "border-[#F0CFAE] bg-[#FFF7EA] text-[#855936]"
-                      : "border-[#E8E0DB] bg-[#FCFAF8] text-[#74645C]"
-                }`}
-              >
-                {reviewerRecommendation.text}
-              </div>
-
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-wide text-[#8C7A71]">
@@ -1445,8 +1350,8 @@ export default function App() {
                   </p>
                 </div>
                 <p className="mt-1 text-xs text-[#85746D]">
-                  Base reviewer-weeks before modifiers:{" "}
-                  {formatNumber(result.estimates.baseReviewerWeeks)}
+                  Base weeks before modifiers:{" "}
+                  {formatNumber(result.estimates.baseWeeks)}
                 </p>
                 {result.complexity?.modifiers?.length ? (
                   <ul className="mt-3 space-y-1.5 text-xs text-[#6F5D55]">
@@ -1503,12 +1408,12 @@ export default function App() {
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <StatCard
-                  label="Reviewer-weeks saved"
-                  value={formatNumber(result.estimates.reviewerWeeksSaved)}
+                  label="Weeks saved"
+                  value={formatNumber(result.estimates.weeksSaved)}
                 />
                 <StatCard
-                  label="Calendar weeks saved"
-                  value={formatNumber(result.estimates.calendarWeeksSaved)}
+                  label="Apex estimate (weeks)"
+                  value={formatNumber(result.estimates.apexWeeks)}
                 />
                 <StatCard
                   label="Percent saved"
@@ -1565,9 +1470,9 @@ export default function App() {
             </button>
             {assumptionsOpen && (
               <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#786860]">
-                <li>Solidity: 1000 LOC ≈ 1 reviewer-week.</li>
-                <li>Rust + C/C++: 1500 LOC ≈ 1 reviewer-week.</li>
-                <li>Other: 2000 LOC ≈ 1 reviewer-week.</li>
+                <li>Solidity: 1000 LOC ≈ 1 week.</li>
+                <li>Rust + C/C++: 1500 LOC ≈ 1 week.</li>
+                <li>Other: 2000 LOC ≈ 1 week.</li>
                 <li>
                   Effective LOC excludes tests, interfaces, mocks, scripts, and
                   generated/vendor/build directories by default.
@@ -1579,10 +1484,6 @@ export default function App() {
                 <li>
                   Smart-contract-only mode excludes the entire “Other” bucket
                   from in-scope LOC.
-                </li>
-                <li>
-                  Team guidance: typical reviews use 2-4 reviewers; for very
-                  small scopes (&lt;300 LOC), solo review can be suggested.
                 </li>
                 <li>
                   Complexity multiplier starts at 1.0 and modifies the estimate:
