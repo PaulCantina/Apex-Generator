@@ -38,3 +38,15 @@ npm run dev
 ```
 
 Open the local URL printed by Vite (usually `http://localhost:5173`).
+
+## Avoid GitHub API rate limits
+
+Unauthenticated GitHub API traffic is limited and large repositories can exceed it quickly.
+
+Use the optional **GitHub token** field in the UI:
+
+1. Generate a new GitHub Personal Access Token (PAT) with minimum required scopes.
+2. Paste it into **GitHub token (optional for higher API limits)**.
+3. Run estimates normally.
+
+The token is only used in browser requests for the current session.

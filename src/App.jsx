@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, GitBranch, Github, Users } from "lucide-react";
+import {
+  ChevronDown,
+  GitBranch,
+  Github,
+  KeyRound,
+  Users,
+} from "lucide-react";
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
 const PRIMARY_GRADIENT = "linear-gradient(to right, #E87C40, #CB5626)";
@@ -164,11 +170,18 @@ function isLikelyBinary(content) {
   return content.includes("\u0000");
 }
 
-async function githubRequest(url) {
+async function githubRequest(url, token = "") {
+  const headers = {
+    Accept: "application/vnd.github+json",
+  };
+
+  const authToken = token.trim();
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  }
+
   const response = await fetch(url, {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -233,9 +246,9 @@ function rawGitHubContentUrl(owner, repo, branch, path) {
   return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${encodedPath}`;
 }
 
-async function fetchBlobContent(owner, repo, branch, file) {
+async function fetchBlobContent(owner, repo, branch, file, token) {
   const blobUrl = `https://api.github.com/repos/${owner}/${repo}/git/blobs/${file.sha}`;
-  const blobData = await githubRequest(blobUrl);
+  const blobData = await githubRequest(blobUrl, token);
 
   if (blobData.truncated) {
     const rawResponse = await fetch(
@@ -280,9 +293,9 @@ async function mapWithConcurrency(items, worker, concurrency = 8) {
   await Promise.all(runners);
 }
 
-async function getLocBreakdown(owner, repo, branch, onProgress) {
+async function getLocBreakdown(owner, repo, branch, onProgress, token) {
   const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-  const treeData = await githubRequest(treeUrl);
+  const treeData = await githubRequest(treeUrl, token);
   if (!treeData.tree || !Array.isArray(treeData.tree)) {
     throw createAppError("api", "Unable to read repository file tree.");
   }
@@ -320,7 +333,7 @@ async function getLocBreakdown(owner, repo, branch, onProgress) {
 
       let text = "";
       try {
-        text = await fetchBlobContent(owner, repo, branch, file);
+        text = await fetchBlobContent(owner, repo, branch, file, token);
       } catch (error) {
         if (error?.code === "rate_limit") {
           throw error;
@@ -523,6 +536,7 @@ function BreakdownPill({ label, value }) {
 export default function App() {
   const [repoUrl, setRepoUrl] = useState("");
   const [branch, setBranch] = useState("");
+  const [githubToken, setGithubToken] = useState("");
   const [reviewers, setReviewers] = useState(2);
   const [mode, setMode] = useState("standard");
   const [statusMessage, setStatusMessage] = useState(
@@ -598,10 +612,12 @@ export default function App() {
 
     setIsLoading(true);
     setStatusMessage("Fetching repository metadata...");
+    const authToken = githubToken.trim();
 
     try {
       const repoData = await githubRequest(
         `https://api.github.com/repos/${parsedRepo.owner}/${parsedRepo.repo}`,
+        authToken,
       );
       if (repoData.private) {
         throw createAppError("private", "Only public repositories are supported.");
@@ -615,6 +631,7 @@ export default function App() {
         parsedRepo.repo,
         selectedBranch,
         (progressMessage) => setStatusMessage(progressMessage),
+        authToken,
       );
 
       const estimates = calculateEstimates(
@@ -642,16 +659,20 @@ export default function App() {
         });
       }
     } catch (error) {
-      setStatusMessage(error.message || "Unable to estimate impact.");
+      const fallbackMessage = error.message || "Unable to estimate impact.";
+      setStatusMessage(fallbackMessage);
       if (error?.code === "rate_limit") {
+        const rateLimitHelp = authToken
+          ? fallbackMessage
+          : `${fallbackMessage} Tip: add a GitHub token below to increase rate limits.`;
         setBanner({
           tone: "rate_limit",
-          message: error.message,
+          message: rateLimitHelp,
         });
       } else {
         setBanner({
           tone: "warning",
-          message: error.message || "Unable to estimate impact.",
+          message: fallbackMessage,
         });
       }
     } finally {
@@ -774,6 +795,27 @@ export default function App() {
                   <option value="standard">Standard</option>
                   <option value="strong">Strong</option>
                 </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                htmlFor="github-token"
+              >
+                GitHub token (optional for higher API limits)
+              </label>
+              <div className="relative">
+                <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  id="github-token"
+                  type="password"
+                  autoComplete="off"
+                  value={githubToken}
+                  onChange={(event) => setGithubToken(event.target.value)}
+                  placeholder="Enter a valid PAT (kept local in this browser session)"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                />
               </div>
             </div>
 
