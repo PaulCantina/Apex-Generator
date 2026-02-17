@@ -346,6 +346,60 @@
         "ipp",
       ]);
 
+      const NON_CODE_EXTENSIONS = new Set([
+        "md",
+        "markdown",
+        "txt",
+        "rst",
+        "adoc",
+        "csv",
+        "tsv",
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+        "webp",
+        "ico",
+        "bmp",
+        "tiff",
+        "pdf",
+        "woff",
+        "woff2",
+        "ttf",
+        "eot",
+        "otf",
+        "mp3",
+        "mp4",
+        "mov",
+        "avi",
+        "zip",
+        "tar",
+        "gz",
+        "tgz",
+        "7z",
+        "rar",
+        "jar",
+        "class",
+        "dll",
+        "so",
+        "dylib",
+        "exe",
+        "bin",
+        "wasm",
+        "lock",
+      ]);
+
+      const NON_CODE_FILENAMES = new Set([
+        "license",
+        "copying",
+        "notice",
+        "readme",
+        "changelog",
+        "contributing",
+        "authors",
+        "codeowners",
+      ]);
+
       const dom = {
         repoUrl: document.getElementById("repoUrl"),
         branch: document.getElementById("branch"),
@@ -425,6 +479,20 @@
         return "other";
       }
 
+      function shouldSkipFile(path) {
+        const lowerPath = path.toLowerCase();
+        const fileName = lowerPath.split("/").pop() || "";
+        const ext = getFileExtension(lowerPath);
+        if (NON_CODE_EXTENSIONS.has(ext)) {
+          return true;
+        }
+        const withoutExt = fileName.replace(/\.[^.]+$/, "");
+        if (NON_CODE_FILENAMES.has(withoutExt)) {
+          return true;
+        }
+        return false;
+      }
+
       function countNonEmptyLines(content) {
         if (!content) {
           return 0;
@@ -472,9 +540,22 @@
         return response.json();
       }
 
-      async function fetchBlobContent(owner, repo, blobSha) {
-        const blobUrl = `https://api.github.com/repos/${owner}/${repo}/git/blobs/${blobSha}`;
+      function rawGitHubContentUrl(owner, repo, branch, path) {
+        const encodedSegments = path.split("/").map((segment) => encodeURIComponent(segment)).join("/");
+        return `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(branch)}/${encodedSegments}`;
+      }
+
+      async function fetchBlobContent(owner, repo, branch, file) {
+        const blobUrl = `https://api.github.com/repos/${owner}/${repo}/git/blobs/${file.sha}`;
         const blobData = await githubRequest(blobUrl);
+
+        if (blobData.truncated) {
+          const rawResponse = await fetch(rawGitHubContentUrl(owner, repo, branch, file.path));
+          if (!rawResponse.ok) {
+            throw new Error(`Unable to fetch large file: ${file.path}`);
+          }
+          return rawResponse.text();
+        }
 
         if (!blobData.content) {
           return "";
@@ -492,20 +573,18 @@
       }
 
       async function mapWithConcurrency(items, worker, concurrency = 8) {
-        const results = new Array(items.length);
         let index = 0;
 
         async function runOne() {
           while (index < items.length) {
             const current = index;
             index += 1;
-            results[current] = await worker(items[current], current);
+            await worker(items[current], current);
           }
         }
 
         const runners = Array.from({ length: Math.min(concurrency, items.length) }, () => runOne());
         await Promise.all(runners);
-        return results;
       }
 
       async function getLocBreakdown(owner, repo, branch) {
@@ -542,20 +621,19 @@
         await mapWithConcurrency(
           files,
           async (file) => {
-            let text = "";
-            try {
-              text = await fetchBlobContent(owner, repo, file.sha);
-            } catch {
+            if (shouldSkipFile(file.path)) {
               skipped += 1;
               processed += 1;
               if (processed % 25 === 0 || processed === files.length) {
                 setStatus(
-                  `Processed ${processed}/${files.length} files (skipped ${skipped} due to fetch limits)...`,
+                  `Processed ${processed}/${files.length} files (skipped ${skipped} filtered/binary)...`,
                   "warn"
                 );
               }
               return;
             }
+
+            const text = await fetchBlobContent(owner, repo, branch, file);
 
             if (!text || isLikelyBinary(text)) {
               skipped += 1;
