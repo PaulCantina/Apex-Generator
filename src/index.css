@@ -1,7 +1,30 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "GT America";
+  src:
+    local("GT America"),
+    local("GT America Standard"),
+    local("GT America Standard Regular"),
+    local("GT-America-Standard-Regular"),
+    local("GTAmerica-Regular"),
+    local("GTAmerica");
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+}
+
 :root {
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "GT America",
+    Inter,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   color: #3e2b26;
   background: #ffffff;
 }
