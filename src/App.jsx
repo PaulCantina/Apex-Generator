@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import cantinaWordmark from "./assets/cantina-wordmark-brand-black.svg";
+import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
 const BRAND_GRADIENT =
   "linear-gradient(to right, #F4A27E, #E87C40, #CB5626, #7B3515)";
@@ -432,9 +432,9 @@ function toApexBarWidth(apexWeeks, manualWeeks) {
 function CantinaLogo() {
   return (
     <img
-      src={cantinaWordmark}
-      alt="Cantina"
-      className="h-9 w-auto sm:h-10"
+      src={cantinaLogomark}
+      alt="Cantina logo"
+      className="h-8 w-8 sm:h-9 sm:w-9"
       loading="eager"
     />
   );
