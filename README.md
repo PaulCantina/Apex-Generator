@@ -11,7 +11,7 @@ A landing-page calculator that estimates security review time and time saved usi
    - C/C++
    - Other
 3. Estimates baseline security review effort and calendar time
-4. Estimates an Apex-assisted timeline with results delivered in **1 day**
+4. Estimates an Apex-assisted timeline with a fixed **0.2 week (~1 day) buffer**
 
 ## What it does not do
 
@@ -30,7 +30,7 @@ A landing-page calculator that estimates security review time and time saved usi
   - Assembly/Unsafe penalty: `+0.20` if Solidity `assembly {` or Rust `unsafe {` appears in more than 2 files
   - Upgradability tax: `+0.10` if `delegatecall`, `fallback`, `UUPS`, or `TransparentUpgradeableProxy` is detected
   - OpenZeppelin discount: `-0.15` if `@openzeppelin` is found in dependencies or Solidity imports
-- Apex delivery: `1 day` (fixed)
+- Apex timeline buffer: `0.2 week` (approximately 1 day)
 - Manual review reduction modes:
   - Conservative: `20%`
   - Standard: `35%`

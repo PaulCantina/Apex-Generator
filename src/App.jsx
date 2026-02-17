@@ -9,6 +9,7 @@ import {
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
 const PRIMARY_GRADIENT = "linear-gradient(to right, #E87C40, #CB5626)";
+const APEX_BUFFER_WEEKS = 0.2;
 
 const MODE_REDUCTION = {
   conservative: 0.2,
@@ -489,17 +490,18 @@ function calculateEstimates(locBreakdown, reviewers, mode, complexityMultiplier 
     (locBreakdown.rust + locBreakdown.ccpp) / 1500 +
     locBreakdown.other / 2000;
   const baselineReviewerWeeks = baseReviewerWeeks * complexityMultiplier;
-  const baselineCalendarWeeks = baselineReviewerWeeks / reviewers;
+  const manualWeeks = baselineReviewerWeeks / reviewers;
 
-  const reduction = MODE_REDUCTION[mode] ?? MODE_REDUCTION.standard;
-  const apexManualReviewerWeeks = baselineReviewerWeeks * (1 - reduction);
-  const apexCalendarWeeks = apexManualReviewerWeeks / reviewers + 1 / 7;
+  const selectedTier = MODE_REDUCTION[mode] ?? MODE_REDUCTION.standard;
+  const timeSaved = manualWeeks * selectedTier;
+  const apexCalendarWeeks = manualWeeks - timeSaved + APEX_BUFFER_WEEKS;
+  const apexManualReviewerWeeks = baselineReviewerWeeks * (1 - selectedTier);
 
   const reviewerWeeksSaved = baselineReviewerWeeks - apexManualReviewerWeeks;
-  const calendarWeeksSaved = baselineCalendarWeeks - apexCalendarWeeks;
+  const calendarWeeksSaved = manualWeeks - apexCalendarWeeks;
   const percentSaved =
-    baselineCalendarWeeks > 0
-      ? Math.max((calendarWeeksSaved / baselineCalendarWeeks) * 100, 0)
+    manualWeeks > 0
+      ? Math.max((calendarWeeksSaved / manualWeeks) * 100, 0)
       : 0;
 
   return {
@@ -507,7 +509,9 @@ function calculateEstimates(locBreakdown, reviewers, mode, complexityMultiplier 
     baseReviewerWeeks,
     complexityMultiplier,
     baselineReviewerWeeks,
-    baselineCalendarWeeks,
+    baselineCalendarWeeks: manualWeeks,
+    manualWeeks,
+    timeSaved,
     apexManualReviewerWeeks,
     apexCalendarWeeks,
     reviewerWeeksSaved,
@@ -1002,7 +1006,7 @@ export default function App() {
                 </div>
 
                 <p className="text-sm text-[#7B6A62]">
-                  Apex results delivered in 1 day (fixed assumption) with{" "}
+                  Apex timeline uses a fixed 0.2-week buffer (~1 day) with{" "}
                   <span className="font-medium capitalize">{mode}</span> mode
                   applied.
                 </p>
@@ -1121,7 +1125,7 @@ export default function App() {
                   OpenZeppelin discount: -0.15 if OpenZeppelin is detected in{" "}
                   <code>package.json</code> dependencies or Solidity imports.
                 </li>
-                <li>Apex timeline assumes fixed delivery in 1 day.</li>
+                <li>Apex timeline adds a fixed 0.2-week buffer (~1 day).</li>
                 <li>
                   Mode reductions for manual review: Conservative 20%, Standard
                   35%, Strong 50%.
