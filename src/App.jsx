@@ -154,6 +154,51 @@ const DEFAULT_GENERATED_VENDOR_DIRS = new Set([
   "coverage",
 ]);
 
+const NON_AUDIT_TOP_LEVEL_KEYWORDS = [
+  "doc",
+  "docs",
+  "example",
+  "examples",
+  "sample",
+  "samples",
+  "bench",
+  "benchmark",
+  "benches",
+  "fuzz",
+  "fuzzing",
+  "playground",
+  "tutorial",
+  "guide",
+  "tool",
+  "tools",
+  "tooling",
+  "script",
+  "scripts",
+  "deploy",
+  "deployment",
+  "ops",
+  "infra",
+  "ci",
+  ".github",
+  ".gitlab",
+  ".circleci",
+  ".yarn",
+  "frontend",
+  "web",
+  "ui",
+  "dashboard",
+  "client",
+  "server",
+  "monitor",
+  "telemetry",
+  "debug",
+  "debugger",
+  "perf",
+  "profiling",
+  "archive",
+  "explorer",
+];
+
 const C_STYLE_COMMENT_EXTENSIONS = new Set([
   "sol",
   "rs",
@@ -285,6 +330,13 @@ function pathMatchesAnyPrefix(path, prefixes) {
   });
 }
 
+function isLikelyNonAuditRoot(segment) {
+  const normalized = segment.toLowerCase();
+  return NON_AUDIT_TOP_LEVEL_KEYWORDS.some(
+    (keyword) => normalized === keyword || normalized.includes(keyword),
+  );
+}
+
 function totalLocFromBreakdown(breakdown) {
   return breakdown.solidity + breakdown.rust + breakdown.ccpp + breakdown.other;
 }
@@ -314,7 +366,7 @@ function getScopeExclusionReason(path, content, scopeOptions) {
   const normalizedPath = normalizeScopePath(path);
   const lowerPath = normalizedPath.toLowerCase();
   const segments = lowerPath.split("/");
-  const fileName = segments[segments.length - 1];
+  const topLevelSegment = segments[0] || "";
 
   if (includePaths.length && !pathMatchesAnyPrefix(normalizedPath, includePaths)) {
     return "Outside selected include paths";
@@ -322,6 +374,10 @@ function getScopeExclusionReason(path, content, scopeOptions) {
 
   if (excludePaths.length && pathMatchesAnyPrefix(normalizedPath, excludePaths)) {
     return "Matched manual exclude path";
+  }
+
+  if (!includePaths.length && isLikelyNonAuditRoot(topLevelSegment)) {
+    return "Likely non-audit top-level package";
   }
 
   if (smartContractOnly && resolveCategory(path) === "other") {
@@ -769,7 +825,11 @@ async function getLocBreakdown(
         assemblyUnsafeFileCount += 1;
       }
 
-      if (!upgradabilityKeywordFound && UPGRADEABILITY_PATTERN.test(text)) {
+      if (
+        !upgradabilityKeywordFound &&
+        ext === "sol" &&
+        UPGRADEABILITY_PATTERN.test(text)
+      ) {
         upgradabilityKeywordFound = true;
       }
 
@@ -1620,7 +1680,8 @@ export default function App() {
                 <li>
                   Upgradability tax: +0.10 if any of <code>delegatecall</code>,{" "}
                   <code>fallback</code>, <code>UUPS</code>, or{" "}
-                  <code>TransparentUpgradeableProxy</code> is detected.
+                  <code>TransparentUpgradeableProxy</code> is detected in
+                  Solidity.
                 </li>
                 <li>
                   OpenZeppelin discount: -0.15 if OpenZeppelin is detected in{" "}

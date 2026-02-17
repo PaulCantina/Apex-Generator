@@ -29,7 +29,7 @@ A landing-page calculator that estimates security review time and time saved usi
   - Final estimated weeks = Base weeks × Complexity multiplier
 - Complexity penalties/discounts:
   - Assembly/Unsafe penalty: `+0.20` if Solidity `assembly {` or Rust `unsafe {` appears in more than 2 files
-  - Upgradability tax: `+0.10` if `delegatecall`, `fallback`, `UUPS`, or `TransparentUpgradeableProxy` is detected
+  - Upgradability tax: `+0.10` if Solidity contains `delegatecall`, `fallback`, `UUPS`, or `TransparentUpgradeableProxy`
   - OpenZeppelin discount: `-0.15` if `@openzeppelin` is found in dependencies or Solidity imports
 - Apex timeline buffer: `0.2 week` (approximately 1 day)
 - Manual review reduction modes:
@@ -45,6 +45,7 @@ By default, the calculator excludes common non-audit scope files:
 - Interfaces (`interfaces/` directories and Solidity interface-only files)
 - Mocks/fixtures/examples/scripts
 - Generated/build/vendor directories (`artifacts`, `out`, `build`, `dist`, `generated`, `vendor`, etc.)
+- Likely non-audit top-level packages (docs, tooling, scripts, dashboards, debug/perf, archive/explorer, etc.)
 
 The UI also supports:
 
