@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, GitBranch, Github, Users } from "lucide-react";
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
-const BRAND_GRADIENT =
-  "linear-gradient(to right, #F4A27E, #E87C40, #CB5626, #7B3515)";
+const PRIMARY_GRADIENT = "linear-gradient(to right, #E87C40, #CB5626)";
 
 const MODE_REDUCTION = {
   conservative: 0.2,
@@ -473,6 +473,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [banner, setBanner] = useState(null);
   const [result, setResult] = useState(null);
+  const [assumptionsOpen, setAssumptionsOpen] = useState(false);
+  const [barsLoaded, setBarsLoaded] = useState(false);
 
   const apexBarWidth = useMemo(() => {
     if (!result) {
@@ -482,6 +484,30 @@ export default function App() {
       result.estimates.apexCalendarWeeks,
       result.estimates.baselineCalendarWeeks,
     );
+  }, [result]);
+
+  useEffect(() => {
+    let frameOne;
+    let frameTwo;
+
+    if (!result) {
+      setBarsLoaded(false);
+      return undefined;
+    }
+
+    setBarsLoaded(false);
+    frameOne = requestAnimationFrame(() => {
+      frameTwo = requestAnimationFrame(() => setBarsLoaded(true));
+    });
+
+    return () => {
+      if (frameOne) {
+        cancelAnimationFrame(frameOne);
+      }
+      if (frameTwo) {
+        cancelAnimationFrame(frameTwo);
+      }
+    };
   }, [result]);
 
   async function handleEstimate(event) {
@@ -577,7 +603,8 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-[#3E2B26]">
-      <div className="pointer-events-none absolute -right-28 -top-40 h-[30rem] w-[30rem] rounded-full bg-[#F4A27E]/35 blur-[120px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 opacity-5 [background-image:radial-gradient(#7b3515_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+      <div className="pointer-events-none absolute -right-32 -top-44 h-[34rem] w-[34rem] rounded-full bg-gradient-to-tr from-[#FF6B35]/10 to-transparent blur-3xl" />
 
       <header className="relative z-10 border-b border-[#F1EAE7] bg-white/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
@@ -587,6 +614,11 @@ export default function App() {
 
       <main className="relative z-10 mx-auto w-full max-w-4xl px-6 pb-20 pt-14">
         <section className="mx-auto max-w-3xl text-center">
+          <div className="mb-4">
+            <span className="inline-flex items-center rounded-full bg-[#E87C40]/10 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#CB5626]">
+              APEX SECURITY IMPACT
+            </span>
+          </div>
           <h1 className="text-4xl font-bold tracking-tight text-[#3E2B26]">
             Accelerate Your Audit Readiness
           </h1>
@@ -596,7 +628,7 @@ export default function App() {
           </p>
         </section>
 
-        <section className="mt-10 rounded-2xl border border-[#F1E9E5] bg-white p-8 shadow-xl shadow-[#7B3515]/10">
+        <section className="mt-10 rounded-2xl border border-gray-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           {banner && (
             <div
               className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
@@ -613,58 +645,67 @@ export default function App() {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label
-                  className="mb-2 block text-sm font-medium text-[#6D5C55]"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
                   htmlFor="repo-url"
                 >
                   GitHub repository URL (public)
                 </label>
-                <input
-                  id="repo-url"
-                  value={repoUrl}
-                  onChange={(event) => setRepoUrl(event.target.value)}
-                  placeholder="https://github.com/owner/repo"
-                  className="w-full rounded-lg border border-[#DCD4D0] bg-white px-4 py-3 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-2 focus:ring-[#F4A27E]/35"
-                  required
-                />
+                <div className="relative">
+                  <Github className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="repo-url"
+                    value={repoUrl}
+                    onChange={(event) => setRepoUrl(event.target.value)}
+                    placeholder="https://github.com/owner/repo"
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                    required
+                  />
+                </div>
               </div>
               <div>
                 <label
-                  className="mb-2 block text-sm font-medium text-[#6D5C55]"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
                   htmlFor="branch"
                 >
                   Branch (optional)
                 </label>
-                <input
-                  id="branch"
-                  value={branch}
-                  onChange={(event) => setBranch(event.target.value)}
-                  placeholder="Default branch"
-                  className="w-full rounded-lg border border-[#DCD4D0] bg-white px-4 py-3 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-2 focus:ring-[#F4A27E]/35"
-                />
+                <div className="relative">
+                  <GitBranch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="branch"
+                    value={branch}
+                    onChange={(event) => setBranch(event.target.value)}
+                    placeholder="Default branch"
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label
-                  className="mb-2 block text-sm font-medium text-[#6D5C55]"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
                   htmlFor="reviewers"
                 >
                   Reviewers
                 </label>
-                <input
-                  id="reviewers"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={reviewers}
-                  onChange={(event) => setReviewers(event.target.value)}
-                  className="w-full rounded-lg border border-[#DCD4D0] bg-white px-4 py-3 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-2 focus:ring-[#F4A27E]/35"
-                />
+                <div className="relative">
+                  <Users className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="reviewers"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={reviewers}
+                    onChange={(event) => setReviewers(event.target.value)}
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                  />
+                </div>
               </div>
               <div>
                 <label
-                  className="mb-2 block text-sm font-medium text-[#6D5C55]"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
                   htmlFor="mode"
                 >
                   Manual reduction mode
@@ -673,7 +714,7 @@ export default function App() {
                   id="mode"
                   value={mode}
                   onChange={(event) => setMode(event.target.value)}
-                  className="w-full rounded-lg border border-[#DCD4D0] bg-white px-4 py-3 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-2 focus:ring-[#F4A27E]/35"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
                 >
                   <option value="conservative">Conservative</option>
                   <option value="standard">Standard</option>
@@ -685,8 +726,7 @@ export default function App() {
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-2 w-full rounded-lg px-5 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
-              style={{ backgroundImage: BRAND_GRADIENT }}
+              className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#E87C40] to-[#CB5626] px-5 py-3 text-sm font-medium tracking-wide text-white shadow-[inset_0px_1px_0px_rgba(255,255,255,0.2)] transition duration-200 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "Calculating..." : "Calculate My Savings"}
             </button>
@@ -713,8 +753,11 @@ export default function App() {
                       Est. {weekLabel(result.estimates.baselineCalendarWeeks)}
                     </span>
                   </div>
-                  <div className="h-4 w-full overflow-hidden rounded-full bg-[#ECE6E2]">
-                    <div className="h-full w-full rounded-full bg-[#CFC6C1]" />
+                  <div className="h-4 w-full overflow-hidden rounded-lg bg-gradient-to-r from-[#F0EBE8] to-[#E5DEDA]">
+                    <div
+                      className="h-full rounded-lg bg-gradient-to-r from-[#CFC4BF] to-[#B5A9A4] transition-[width] duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
+                      style={{ width: barsLoaded ? "100%" : "0%" }}
+                    />
                   </div>
                 </div>
 
@@ -725,12 +768,12 @@ export default function App() {
                       Est. {weekLabel(result.estimates.apexCalendarWeeks)}
                     </span>
                   </div>
-                  <div className="h-4 w-full overflow-hidden rounded-full bg-[#F4EFEC]">
+                  <div className="h-4 w-full overflow-hidden rounded-lg bg-[#F5EEEA]">
                     <div
-                      className="h-full rounded-full"
+                      className="h-full rounded-lg transition-[width] duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
                       style={{
-                        width: `${apexBarWidth}%`,
-                        backgroundImage: BRAND_GRADIENT,
+                        width: barsLoaded ? `${apexBarWidth}%` : "0%",
+                        backgroundImage: PRIMARY_GRADIENT,
                       }}
                     />
                   </div>
@@ -789,25 +832,36 @@ export default function App() {
             </div>
           )}
 
-          <details className="mt-6 rounded-lg border border-[#ECE3DE] bg-[#FCFAF8] p-4">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-[#5D4B45]">
-              How is this calculated?
-            </summary>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#786860]">
-              <li>Solidity: 1000 LOC ≈ 1 reviewer-week.</li>
-              <li>Rust + C/C++: 1500 LOC ≈ 1 reviewer-week.</li>
-              <li>Other: 2000 LOC ≈ 1 reviewer-week.</li>
-              <li>Apex timeline assumes fixed delivery in 1 day.</li>
-              <li>
-                Mode reductions for manual review: Conservative 20%, Standard
-                35%, Strong 50%.
-              </li>
-              <li>
-                LOC-based estimation only. No vulnerability detection or
-                catch-rate claims are included.
-              </li>
-            </ul>
-          </details>
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setAssumptionsOpen((isOpen) => !isOpen)}
+              className="flex cursor-pointer items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-800"
+            >
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-200 ${
+                  assumptionsOpen ? "rotate-180" : ""
+                }`}
+              />
+              <span>How is this calculated?</span>
+            </button>
+            {assumptionsOpen && (
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#786860]">
+                <li>Solidity: 1000 LOC ≈ 1 reviewer-week.</li>
+                <li>Rust + C/C++: 1500 LOC ≈ 1 reviewer-week.</li>
+                <li>Other: 2000 LOC ≈ 1 reviewer-week.</li>
+                <li>Apex timeline assumes fixed delivery in 1 day.</li>
+                <li>
+                  Mode reductions for manual review: Conservative 20%, Standard
+                  35%, Strong 50%.
+                </li>
+                <li>
+                  LOC-based estimation only. No vulnerability detection or
+                  catch-rate claims are included.
+                </li>
+              </ul>
+            )}
+          </div>
         </section>
       </main>
     </div>
