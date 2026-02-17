@@ -83,6 +83,12 @@ const NON_CODE_FILENAMES = new Set([
   "codeowners",
 ]);
 
+const ASSEMBLY_PATTERN = /\bassembly\s*\{/;
+const UNSAFE_PATTERN = /\bunsafe\s*\{/;
+const UPGRADEABILITY_PATTERN =
+  /\bdelegatecall\b|\bfallback\b|TransparentUpgradeableProxy|\bUUPS\b/i;
+const OPENZEPPELIN_PATTERN = /@openzeppelin/i;
+
 function createAppError(code, message) {
   const error = new Error(message);
   error.code = code;
@@ -168,6 +174,33 @@ function countNonEmptyLines(content) {
 
 function isLikelyBinary(content) {
   return content.includes("\u0000");
+}
+
+function packageJsonUsesOpenZeppelin(content) {
+  try {
+    const parsed = JSON.parse(content);
+    const dependencyKeys = [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+      "resolutions",
+    ];
+
+    for (const key of dependencyKeys) {
+      const bucket = parsed?.[key];
+      if (!bucket || typeof bucket !== "object") {
+        continue;
+      }
+      if (Object.keys(bucket).some((pkg) => pkg.toLowerCase().includes("@openzeppelin"))) {
+        return true;
+      }
+    }
+  } catch {
+    return OPENZEPPELIN_PATTERN.test(content);
+  }
+
+  return false;
 }
 
 async function githubRequest(url, token = "") {
@@ -314,6 +347,10 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
     other: 0,
   };
 
+  let assemblyUnsafeFileCount = 0;
+  let upgradabilityKeywordFound = false;
+  let openZeppelinDetected = false;
+
   let processed = 0;
   let skipped = 0;
 
@@ -361,6 +398,31 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
 
       const loc = countNonEmptyLines(text);
       breakdown[resolveCategory(file.path)] += loc;
+
+      const ext = getFileExtension(file.path);
+      if (ext === "sol") {
+        if (ASSEMBLY_PATTERN.test(text)) {
+          assemblyUnsafeFileCount += 1;
+        }
+        if (!openZeppelinDetected && OPENZEPPELIN_PATTERN.test(text)) {
+          openZeppelinDetected = true;
+        }
+      } else if (ext === "rs" && UNSAFE_PATTERN.test(text)) {
+        assemblyUnsafeFileCount += 1;
+      }
+
+      if (
+        !openZeppelinDetected &&
+        file.path.toLowerCase().endsWith("package.json") &&
+        packageJsonUsesOpenZeppelin(text)
+      ) {
+        openZeppelinDetected = true;
+      }
+
+      if (!upgradabilityKeywordFound && UPGRADEABILITY_PATTERN.test(text)) {
+        upgradabilityKeywordFound = true;
+      }
+
       processed += 1;
 
       if (processed % 25 === 0 || processed === files.length) {
@@ -372,23 +434,61 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
     8,
   );
 
+  let complexityMultiplier = 1.0;
+  const modifiers = [];
+
+  if (assemblyUnsafeFileCount > 2) {
+    complexityMultiplier += 0.2;
+    modifiers.push({
+      label: "Assembly/unsafe penalty",
+      impact: +0.2,
+      reason: "Detected assembly/unsafe blocks in more than 2 files.",
+    });
+  }
+
+  if (upgradabilityKeywordFound) {
+    complexityMultiplier += 0.1;
+    modifiers.push({
+      label: "Upgradability tax",
+      impact: +0.1,
+      reason: "Detected delegatecall/fallback/UUPS/proxy keywords.",
+    });
+  }
+
+  if (openZeppelinDetected) {
+    complexityMultiplier -= 0.15;
+    modifiers.push({
+      label: "OpenZeppelin discount",
+      impact: -0.15,
+      reason: "Detected OpenZeppelin dependency/import usage.",
+    });
+  }
+
   return {
     breakdown,
     truncated: Boolean(treeData.truncated),
+    complexity: {
+      multiplier: complexityMultiplier,
+      modifiers,
+      assemblyUnsafeFileCount,
+      upgradabilityKeywordFound,
+      openZeppelinDetected,
+    },
   };
 }
 
-function calculateEstimates(locBreakdown, reviewers, mode) {
+function calculateEstimates(locBreakdown, reviewers, mode, complexityMultiplier = 1.0) {
   const totalLoc =
     locBreakdown.solidity +
     locBreakdown.rust +
     locBreakdown.ccpp +
     locBreakdown.other;
 
-  const baselineReviewerWeeks =
+  const baseReviewerWeeks =
     locBreakdown.solidity / 1000 +
     (locBreakdown.rust + locBreakdown.ccpp) / 1500 +
     locBreakdown.other / 2000;
+  const baselineReviewerWeeks = baseReviewerWeeks * complexityMultiplier;
   const baselineCalendarWeeks = baselineReviewerWeeks / reviewers;
 
   const reduction = MODE_REDUCTION[mode] ?? MODE_REDUCTION.standard;
@@ -404,6 +504,8 @@ function calculateEstimates(locBreakdown, reviewers, mode) {
 
   return {
     totalLoc,
+    baseReviewerWeeks,
+    complexityMultiplier,
     baselineReviewerWeeks,
     baselineCalendarWeeks,
     apexManualReviewerWeeks,
@@ -432,6 +534,11 @@ function weekLabel(weeks) {
   const rounded = formatCompact(weeks);
   const unit = Number(rounded) === 1 ? "Week" : "Weeks";
   return `${rounded} ${unit}`;
+}
+
+function formatModifierImpact(impact) {
+  const sign = impact >= 0 ? "+" : "";
+  return `${sign}${impact.toFixed(2)}`;
 }
 
 function toApexBarWidth(apexWeeks, manualWeeks) {
@@ -645,6 +752,7 @@ export default function App() {
         locData.breakdown,
         Math.max(1, Math.round(reviewerCount)),
         mode,
+        locData.complexity?.multiplier ?? 1.0,
       );
 
       setResult({
@@ -653,6 +761,7 @@ export default function App() {
         branch: selectedBranch,
         locBreakdown: locData.breakdown,
         truncated: locData.truncated,
+        complexity: locData.complexity,
         estimates,
       });
 
@@ -899,6 +1008,38 @@ export default function App() {
                 </p>
               </div>
 
+              <div className="mt-5 rounded-xl border border-[#E6DDD9] bg-[#FBF8F6] p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-[#5F4E47]">
+                    Complexity multiplier
+                  </p>
+                  <p className="text-sm font-semibold text-[#3E2B26]">
+                    x{formatNumber(result.estimates.complexityMultiplier)}
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-[#85746D]">
+                  Base reviewer-weeks before modifiers:{" "}
+                  {formatNumber(result.estimates.baseReviewerWeeks)}
+                </p>
+                {result.complexity?.modifiers?.length ? (
+                  <ul className="mt-3 space-y-1.5 text-xs text-[#6F5D55]">
+                    {result.complexity.modifiers.map((modifier) => (
+                      <li key={modifier.label} className="flex flex-wrap gap-1">
+                        <span className="font-medium">{modifier.label}</span>
+                        <span className="text-[#7D6A62]">
+                          ({formatModifierImpact(modifier.impact)})
+                        </span>
+                        <span className="text-[#8C7A72]">- {modifier.reason}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-xs text-[#8C7A72]">
+                    No complexity keyword modifiers detected.
+                  </p>
+                )}
+              </div>
+
               <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <StatCard
                   label="Reviewer-weeks saved"
@@ -963,6 +1104,23 @@ export default function App() {
                 <li>Solidity: 1000 LOC ≈ 1 reviewer-week.</li>
                 <li>Rust + C/C++: 1500 LOC ≈ 1 reviewer-week.</li>
                 <li>Other: 2000 LOC ≈ 1 reviewer-week.</li>
+                <li>
+                  Complexity multiplier starts at 1.0 and modifies the estimate:
+                  Final Weeks = Base Weeks × complexityMultiplier.
+                </li>
+                <li>
+                  Assembly/unsafe penalty: +0.20 if Solidity <code>assembly</code>
+                  or Rust <code>unsafe</code> appears in more than 2 files.
+                </li>
+                <li>
+                  Upgradability tax: +0.10 if any of <code>delegatecall</code>,{" "}
+                  <code>fallback</code>, <code>UUPS</code>, or{" "}
+                  <code>TransparentUpgradeableProxy</code> is detected.
+                </li>
+                <li>
+                  OpenZeppelin discount: -0.15 if OpenZeppelin is detected in{" "}
+                  <code>package.json</code> dependencies or Solidity imports.
+                </li>
                 <li>Apex timeline assumes fixed delivery in 1 day.</li>
                 <li>
                   Mode reductions for manual review: Conservative 20%, Standard

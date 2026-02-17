@@ -24,6 +24,12 @@ A landing-page calculator that estimates security review time and time saved usi
 - Solidity: `1000 LOC ≈ 1 reviewer-week`
 - Rust + C/C++: `1500 LOC ≈ 1 reviewer-week`
 - Other: `2000 LOC ≈ 1 reviewer-week`
+- Complexity multiplier starts at `1.0` and is applied to baseline effort:
+  - Final estimated weeks = Base weeks × Complexity multiplier
+- Complexity penalties/discounts:
+  - Assembly/Unsafe penalty: `+0.20` if Solidity `assembly {` or Rust `unsafe {` appears in more than 2 files
+  - Upgradability tax: `+0.10` if `delegatecall`, `fallback`, `UUPS`, or `TransparentUpgradeableProxy` is detected
+  - OpenZeppelin discount: `-0.15` if `@openzeppelin` is found in dependencies or Solidity imports
 - Apex delivery: `1 day` (fixed)
 - Manual review reduction modes:
   - Conservative: `20%`
