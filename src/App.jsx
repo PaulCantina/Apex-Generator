@@ -154,6 +154,47 @@ const DEFAULT_GENERATED_VENDOR_DIRS = new Set([
   "coverage",
 ]);
 
+const C_STYLE_COMMENT_EXTENSIONS = new Set([
+  "sol",
+  "rs",
+  "c",
+  "cc",
+  "cpp",
+  "cxx",
+  "h",
+  "hh",
+  "hpp",
+  "hxx",
+  "inc",
+  "ipp",
+  "js",
+  "jsx",
+  "ts",
+  "tsx",
+  "java",
+  "go",
+  "cs",
+  "swift",
+  "kt",
+  "kts",
+  "dart",
+  "css",
+  "scss",
+]);
+
+const HASH_COMMENT_EXTENSIONS = new Set([
+  "py",
+  "rb",
+  "sh",
+  "bash",
+  "zsh",
+  "yaml",
+  "yml",
+  "toml",
+  "ini",
+  "conf",
+]);
+
 
 function createAppError(code, message) {
   const error = new Error(message);
@@ -343,6 +384,85 @@ function countNonEmptyLines(content) {
     }
   }
   return count;
+}
+
+function countCStyleCodeLines(content) {
+  const lines = content.replace(/\r\n/g, "\n").split("\n");
+  let inBlockComment = false;
+  let count = 0;
+
+  for (const line of lines) {
+    let i = 0;
+    let hasCode = false;
+
+    while (i < line.length) {
+      if (inBlockComment) {
+        const end = line.indexOf("*/", i);
+        if (end === -1) {
+          i = line.length;
+          break;
+        }
+        inBlockComment = false;
+        i = end + 2;
+        continue;
+      }
+
+      const current = line[i];
+      const next = line[i + 1];
+
+      if (current === "/" && next === "*") {
+        inBlockComment = true;
+        i += 2;
+        continue;
+      }
+
+      if (current === "/" && next === "/") {
+        break;
+      }
+
+      if (!/\s/.test(current)) {
+        hasCode = true;
+        break;
+      }
+
+      i += 1;
+    }
+
+    if (hasCode) {
+      count += 1;
+    }
+  }
+
+  return count;
+}
+
+function countHashCommentCodeLines(content) {
+  const lines = content.replace(/\r\n/g, "\n").split("\n");
+  let count = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      continue;
+    }
+    if (trimmed.startsWith("#")) {
+      continue;
+    }
+    count += 1;
+  }
+
+  return count;
+}
+
+function countEffectiveCodeLines(path, content) {
+  const fileExtension = getFileExtension(path);
+  if (C_STYLE_COMMENT_EXTENSIONS.has(fileExtension)) {
+    return countCStyleCodeLines(content);
+  }
+  if (HASH_COMMENT_EXTENSIONS.has(fileExtension)) {
+    return countHashCommentCodeLines(content);
+  }
+  return countNonEmptyLines(content);
 }
 
 function isLikelyBinary(content) {
@@ -596,7 +716,7 @@ async function getLocBreakdown(
         return;
       }
 
-      const loc = countNonEmptyLines(text);
+      const loc = countEffectiveCodeLines(file.path, text);
       const category = resolveCategory(file.path);
       if (loc > 0) {
         rawBreakdown[category] += loc;
@@ -906,7 +1026,7 @@ export default function App() {
   const [githubToken, setGithubToken] = useState("");
   const [includePathsInput, setIncludePathsInput] = useState("");
   const [excludePathsInput, setExcludePathsInput] = useState("");
-  const [smartContractOnly, setSmartContractOnly] = useState(false);
+  const [smartContractOnly, setSmartContractOnly] = useState(true);
   const [mode, setMode] = useState("standard");
   const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
   const [statusMessage, setStatusMessage] = useState(
@@ -1268,7 +1388,7 @@ export default function App() {
               />
               <span>
                 <span className="text-sm font-medium text-[#5E4A43]">
-                  Smart-contract-only mode
+                  Smart-contract-only mode (default on)
                 </span>
                 <span className="mt-1 block text-xs text-[#8A786F]">
                   Excludes the “Other” language bucket from in-scope LOC.
@@ -1470,9 +1590,13 @@ export default function App() {
             </button>
             {assumptionsOpen && (
               <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#786860]">
-                <li>Solidity: 1000 LOC ≈ 1 week.</li>
-                <li>Rust + C/C++: 1500 LOC ≈ 1 week.</li>
-                <li>Other: 2000 LOC ≈ 1 week.</li>
+                <li>Solidity: 1000 code LOC ≈ 1 week.</li>
+                <li>Rust + C/C++: 1500 code LOC ≈ 1 week.</li>
+                <li>Other: 2000 code LOC ≈ 1 week.</li>
+                <li>
+                  LOC counting excludes blank lines and comment-only lines where
+                  supported.
+                </li>
                 <li>
                   Effective LOC excludes tests, interfaces, mocks, scripts, and
                   generated/vendor/build directories by default.

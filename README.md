@@ -21,9 +21,10 @@ A landing-page calculator that estimates security review time and time saved usi
 
 ## Assumptions
 
-- Solidity: `1000 LOC ≈ 1 week`
-- Rust + C/C++: `1500 LOC ≈ 1 week`
-- Other: `2000 LOC ≈ 1 week`
+- Solidity: `1000 code LOC ≈ 1 week`
+- Rust + C/C++: `1500 code LOC ≈ 1 week`
+- Other: `2000 code LOC ≈ 1 week`
+- LOC counting excludes blank lines and comment-only lines where supported
 - Complexity multiplier starts at `1.0` and is applied to baseline effort:
   - Final estimated weeks = Base weeks × Complexity multiplier
 - Complexity penalties/discounts:
