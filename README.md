@@ -32,4 +32,9 @@ A landing-page calculator that estimates security review time and time saved usi
 
 ## Run locally
 
-Open `index.html` in your browser.
+```bash
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite (usually `http://localhost:5173`).
