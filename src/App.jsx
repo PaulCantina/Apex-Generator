@@ -155,6 +155,8 @@ const DEFAULT_GENERATED_VENDOR_DIRS = new Set([
   "coverage",
 ]);
 
+const SOLO_REVIEW_MAX_LOC = 300;
+
 function createAppError(code, message) {
   const error = new Error(message);
   error.code = code;
@@ -264,7 +266,12 @@ function isSolidityInterfaceFile(path, content) {
 }
 
 function getScopeExclusionReason(path, content, scopeOptions) {
-  const { includePaths, excludePaths, useDefaultScopeExclusions } = scopeOptions;
+  const {
+    includePaths,
+    excludePaths,
+    useDefaultScopeExclusions,
+    smartContractOnly,
+  } = scopeOptions;
   const normalizedPath = normalizeScopePath(path);
   const lowerPath = normalizedPath.toLowerCase();
   const segments = lowerPath.split("/");
@@ -276,6 +283,10 @@ function getScopeExclusionReason(path, content, scopeOptions) {
 
   if (excludePaths.length && pathMatchesAnyPrefix(normalizedPath, excludePaths)) {
     return "Matched manual exclude path";
+  }
+
+  if (smartContractOnly && resolveCategory(path) === "other") {
+    return "Excluded by smart-contract-only mode";
   }
 
   if (!useDefaultScopeExclusions) {
@@ -502,6 +513,7 @@ async function getLocBreakdown(
   const excludePaths = scopeOptions.excludePaths ?? [];
   const useDefaultScopeExclusions =
     scopeOptions.useDefaultScopeExclusions !== false;
+  const smartContractOnly = scopeOptions.smartContractOnly === true;
 
   const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
   const treeData = await githubRequest(treeUrl, token);
@@ -610,6 +622,7 @@ async function getLocBreakdown(
         includePaths,
         excludePaths,
         useDefaultScopeExclusions,
+        smartContractOnly,
       });
 
       if (scopeExclusionReason) {
@@ -702,6 +715,7 @@ async function getLocBreakdown(
       includePaths,
       excludePaths,
       useDefaultScopeExclusions,
+      smartContractOnly,
       rawTotalLoc,
       effectiveTotalLoc,
       excludedTotalLoc,
@@ -784,6 +798,34 @@ function weekLabel(weeks) {
 function formatModifierImpact(impact) {
   const sign = impact >= 0 ? "+" : "";
   return `${sign}${impact.toFixed(2)}`;
+}
+
+function getReviewerRecommendation(effectiveLoc, selectedReviewers) {
+  if (effectiveLoc < SOLO_REVIEW_MAX_LOC) {
+    return {
+      text: "Suggested team: 1 reviewer (solo), since in-scope LOC is below 300.",
+      tone: "recommend",
+    };
+  }
+
+  if (selectedReviewers < 2) {
+    return {
+      text: "Typical team size is 2-4 reviewers for this scope; consider increasing coverage.",
+      tone: "warning",
+    };
+  }
+
+  if (selectedReviewers > 4) {
+    return {
+      text: "Typical team size is 2-4 reviewers; higher staffing may reduce calendar time but increase reviewer-weeks.",
+      tone: "warning",
+    };
+  }
+
+  return {
+    text: "Suggested team size: 2-4 reviewers (depends mostly on client budget).",
+    tone: "default",
+  };
 }
 
 function toApexBarWidth(apexWeeks, manualWeeks) {
@@ -898,6 +940,7 @@ export default function App() {
   const [githubToken, setGithubToken] = useState("");
   const [includePathsInput, setIncludePathsInput] = useState("");
   const [excludePathsInput, setExcludePathsInput] = useState("");
+  const [smartContractOnly, setSmartContractOnly] = useState(false);
   const [reviewers, setReviewers] = useState(2);
   const [mode, setMode] = useState("standard");
   const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
@@ -926,6 +969,17 @@ export default function App() {
       MODE_SELECTION_CARDS[1],
     [mode],
   );
+
+  const reviewerRecommendation = useMemo(() => {
+    const effectiveLoc = result?.scopeSummary?.effectiveTotalLoc;
+    if (typeof effectiveLoc !== "number") {
+      return {
+        text: "Typical team size is 2-4 reviewers. For very small scopes (<300 LOC), a solo review can be considered.",
+        tone: "default",
+      };
+    }
+    return getReviewerRecommendation(effectiveLoc, Number(reviewers));
+  }, [result, reviewers]);
 
   useEffect(() => {
     let frameOne;
@@ -1016,6 +1070,7 @@ export default function App() {
           includePaths,
           excludePaths,
           useDefaultScopeExclusions: true,
+          smartContractOnly,
         },
       );
 
@@ -1184,6 +1239,10 @@ export default function App() {
                   className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
                 />
               </div>
+              <p className="mt-1.5 text-xs text-[#8A786F]">
+                Typical teams use 2-4 reviewers. For scopes under 300 LOC, a
+                solo review can be appropriate.
+              </p>
             </div>
 
             <div>
@@ -1283,6 +1342,24 @@ export default function App() {
               scripts, generated and vendor/build folders).
             </p>
 
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 bg-gray-50/60 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={smartContractOnly}
+                onChange={(event) => setSmartContractOnly(event.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#E87C40] focus:ring-[#E87C40]/30"
+              />
+              <span>
+                <span className="text-sm font-medium text-[#5E4A43]">
+                  Smart-contract-only mode
+                </span>
+                <span className="mt-1 block text-xs text-[#8A786F]">
+                  Excludes the “Other” language bucket from in-scope LOC.
+                  Recommended for pure protocol contract audit scoping.
+                </span>
+              </span>
+            </label>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -1296,6 +1373,18 @@ export default function App() {
 
           {result && (
             <div className="mt-8 border-t border-[#F1EAE6] pt-8">
+              <div
+                className={`mb-4 rounded-lg border px-4 py-3 text-sm ${
+                  reviewerRecommendation.tone === "recommend"
+                    ? "border-[#E4C9B9] bg-[#FFF7F1] text-[#7D4D32]"
+                    : reviewerRecommendation.tone === "warning"
+                      ? "border-[#F0CFAE] bg-[#FFF7EA] text-[#855936]"
+                      : "border-[#E8E0DB] bg-[#FCFAF8] text-[#74645C]"
+                }`}
+              >
+                {reviewerRecommendation.text}
+              </div>
+
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-wide text-[#8C7A71]">
@@ -1486,6 +1575,14 @@ export default function App() {
                 <li>
                   Optional include/exclude path filters can further narrow audit
                   scope.
+                </li>
+                <li>
+                  Smart-contract-only mode excludes the entire “Other” bucket
+                  from in-scope LOC.
+                </li>
+                <li>
+                  Team guidance: typical reviews use 2-4 reviewers; for very
+                  small scopes (&lt;300 LOC), solo review can be suggested.
                 </li>
                 <li>
                   Complexity multiplier starts at 1.0 and modifies the estimate:

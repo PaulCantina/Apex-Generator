@@ -49,12 +49,18 @@ The UI also supports:
 
 - **Include paths (optional):** only analyze matching subpaths
 - **Exclude paths (optional):** remove matching subpaths from analysis
+- **Smart-contract-only mode:** excludes the **Other** language bucket from in-scope LOC
 
 Results show:
 
 - Raw LOC scanned
 - Excluded LOC
 - Effective LOC used in estimation
+
+## Reviewer team guidance
+
+- Typical team size: **2-4 reviewers** (usually budget dependent)
+- If effective in-scope LOC is under **300**, the UI suggests a **solo review** option
 
 ## Run locally
 
