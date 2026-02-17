@@ -499,10 +499,10 @@ function FloatingNavbar() {
               Login
             </a>
             <a
-              href="#"
+              href="#calculator"
               className="shimmer-button inline-flex items-center rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-black"
             >
-              <span className="relative z-10">Book Audit</span>
+              <span className="relative z-10">Run a Scan</span>
             </a>
           </div>
         </div>
@@ -513,22 +513,29 @@ function FloatingNavbar() {
 
 function StatCard({ label, value }) {
   return (
-    <div className="rounded-xl border border-[#EDE6E2] bg-[#FFFEFE] p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-[#8A786F]">
-        {label}
-      </p>
-      <p className="mt-2 text-xl font-semibold text-[#3E2B26]">{value}</p>
+    <div className="relative overflow-hidden rounded-xl border border-[#EDE6E2] bg-[linear-gradient(165deg,#ffffff_0%,#fdf9f7_100%)] p-4">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,#d8dde6_1px,transparent_1px),linear-gradient(to_bottom,#d8dde6_1px,transparent_1px)] [background-size:18px_18px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#E8C1AF] to-transparent" />
+      <div className="relative">
+        <p className="text-xs font-medium uppercase tracking-wide text-[#8A786F]">
+          {label}
+        </p>
+        <p className="mt-2 text-xl font-semibold text-[#3E2B26]">{value}</p>
+      </div>
     </div>
   );
 }
 
 function BreakdownPill({ label, value }) {
   return (
-    <div className="rounded-lg border border-[#EEE7E3] bg-[#FAF8F7] px-3 py-2">
-      <p className="text-xs uppercase tracking-wide text-[#8A786F]">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-[#3E2B26]">
-        {formatNumber(value, 0)} LOC
-      </p>
+    <div className="relative overflow-hidden rounded-lg border border-[#EEE7E3] bg-[linear-gradient(165deg,#fdfbfa_0%,#f7f2ef_100%)] px-3 py-2">
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#E87C40]/10 to-transparent" />
+      <div className="relative">
+        <p className="text-xs uppercase tracking-wide text-[#8A786F]">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-[#3E2B26]">
+          {formatNumber(value, 0)} LOC
+        </p>
+      </div>
     </div>
   );
 }
@@ -703,7 +710,17 @@ export default function App() {
           </p>
         </section>
 
-        <section className="mt-10 rounded-2xl border border-gray-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <section
+          id="calculator"
+          className="relative mt-10 overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+        >
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,#d8dde6_1px,transparent_1px),linear-gradient(to_bottom,#d8dde6_1px,transparent_1px)] [background-size:22px_22px]" />
+            <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#E87C40]/12 to-transparent blur-2xl" />
+            <div className="absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-[#9CB6FF]/10 to-transparent blur-2xl" />
+          </div>
+
+          <div className="relative z-10">
           {banner && (
             <div
               className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
@@ -957,6 +974,7 @@ export default function App() {
                 </li>
               </ul>
             )}
+          </div>
           </div>
         </section>
       </main>
