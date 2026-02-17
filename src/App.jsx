@@ -113,6 +113,47 @@ const UNSAFE_PATTERN = /\bunsafe\s*\{/;
 const UPGRADEABILITY_PATTERN =
   /\bdelegatecall\b|\bfallback\b|TransparentUpgradeableProxy|\bUUPS\b/i;
 const OPENZEPPELIN_PATTERN = /@openzeppelin/i;
+const DEFAULT_TEST_FILE_PATTERN =
+  /\.(test|spec)\.[a-z0-9]+$|\.t\.sol$|(^|\/)test[^/]*\.sol$/i;
+const DEFAULT_INTERFACE_FILENAME_PATTERN = /^i[A-Z0-9_][^/]*\.sol$/;
+
+const DEFAULT_AUDIT_EXCLUDED_DIRS = new Set([
+  "test",
+  "tests",
+  "__tests__",
+  "spec",
+  "specs",
+  "mock",
+  "mocks",
+  "fixture",
+  "fixtures",
+  "example",
+  "examples",
+  "script",
+  "scripts",
+  "benchmark",
+  "benchmarks",
+  "sample",
+  "samples",
+  "demo",
+  "demos",
+]);
+
+const DEFAULT_GENERATED_VENDOR_DIRS = new Set([
+  "artifacts",
+  "out",
+  "build",
+  "dist",
+  "generated",
+  "gen",
+  ".generated",
+  "cache",
+  ".cache",
+  "node_modules",
+  "vendor",
+  "typechain",
+  "coverage",
+]);
 
 function createAppError(code, message) {
   const error = new Error(message);
@@ -171,6 +212,104 @@ function resolveCategory(path) {
     return "ccpp";
   }
   return "other";
+}
+
+function normalizeScopePath(path) {
+  return path
+    .trim()
+    .replace(/\\/g, "/")
+    .replace(/^\.?\/*/, "")
+    .replace(/\/+$/, "");
+}
+
+function parseScopePaths(value) {
+  return value
+    .split(/[,\n]/)
+    .map((item) => normalizeScopePath(item))
+    .filter(Boolean);
+}
+
+function pathMatchesAnyPrefix(path, prefixes) {
+  if (!prefixes.length) {
+    return false;
+  }
+
+  const normalizedPath = normalizeScopePath(path).toLowerCase();
+  return prefixes.some((prefix) => {
+    const normalizedPrefix = normalizeScopePath(prefix).toLowerCase();
+    return (
+      normalizedPath === normalizedPrefix ||
+      normalizedPath.startsWith(`${normalizedPrefix}/`)
+    );
+  });
+}
+
+function totalLocFromBreakdown(breakdown) {
+  return breakdown.solidity + breakdown.rust + breakdown.ccpp + breakdown.other;
+}
+
+function isSolidityInterfaceFile(path, content) {
+  if (getFileExtension(path) !== "sol") {
+    return false;
+  }
+
+  const fileName = path.split("/").pop() || "";
+  if (!DEFAULT_INTERFACE_FILENAME_PATTERN.test(fileName)) {
+    return false;
+  }
+
+  const hasInterface = /\binterface\b/.test(content);
+  const hasContractOrLibrary = /\bcontract\b|\blibrary\b/.test(content);
+  return hasInterface && !hasContractOrLibrary;
+}
+
+function getScopeExclusionReason(path, content, scopeOptions) {
+  const { includePaths, excludePaths, useDefaultScopeExclusions } = scopeOptions;
+  const normalizedPath = normalizeScopePath(path);
+  const lowerPath = normalizedPath.toLowerCase();
+  const segments = lowerPath.split("/");
+  const fileName = segments[segments.length - 1];
+
+  if (includePaths.length && !pathMatchesAnyPrefix(normalizedPath, includePaths)) {
+    return "Outside selected include paths";
+  }
+
+  if (excludePaths.length && pathMatchesAnyPrefix(normalizedPath, excludePaths)) {
+    return "Matched manual exclude path";
+  }
+
+  if (!useDefaultScopeExclusions) {
+    return null;
+  }
+
+  if (segments.some((segment) => DEFAULT_TEST_FILE_PATTERN.test(segment))) {
+    return "Matched test/spec naming pattern";
+  }
+
+  if (segments.some((segment) => DEFAULT_AUDIT_EXCLUDED_DIRS.has(segment))) {
+    return "In test/mock/script/example directory";
+  }
+
+  if (segments.some((segment) => DEFAULT_GENERATED_VENDOR_DIRS.has(segment))) {
+    return "In generated/build/vendor directory";
+  }
+
+  if (DEFAULT_TEST_FILE_PATTERN.test(lowerPath)) {
+    return "Matched test/spec naming pattern";
+  }
+
+  if (
+    getFileExtension(path) === "sol" &&
+    (segments.includes("interfaces") || isSolidityInterfaceFile(path, content))
+  ) {
+    return "Interface file excluded";
+  }
+
+  if (/(^|\/)i[a-z0-9_]+\.sol$/i.test(lowerPath) && /\binterface\b/i.test(content)) {
+    return "Interface file excluded";
+  }
+
+  return null;
 }
 
 function shouldSkipFile(path) {
@@ -351,7 +490,19 @@ async function mapWithConcurrency(items, worker, concurrency = 8) {
   await Promise.all(runners);
 }
 
-async function getLocBreakdown(owner, repo, branch, onProgress, token) {
+async function getLocBreakdown(
+  owner,
+  repo,
+  branch,
+  onProgress,
+  token,
+  scopeOptions = {},
+) {
+  const includePaths = scopeOptions.includePaths ?? [];
+  const excludePaths = scopeOptions.excludePaths ?? [];
+  const useDefaultScopeExclusions =
+    scopeOptions.useDefaultScopeExclusions !== false;
+
   const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
   const treeData = await githubRequest(treeUrl, token);
   if (!treeData.tree || !Array.isArray(treeData.tree)) {
@@ -365,7 +516,19 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
 
   onProgress?.(`Found ${files.length} files. Counting LOC...`);
 
-  const breakdown = {
+  const rawBreakdown = {
+    solidity: 0,
+    rust: 0,
+    ccpp: 0,
+    other: 0,
+  };
+  const effectiveBreakdown = {
+    solidity: 0,
+    rust: 0,
+    ccpp: 0,
+    other: 0,
+  };
+  const excludedBreakdown = {
     solidity: 0,
     rust: 0,
     ccpp: 0,
@@ -378,6 +541,8 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
 
   let processed = 0;
   let skipped = 0;
+  let excludedFiles = 0;
+  const exclusionReasonCounts = {};
 
   await mapWithConcurrency(
     files,
@@ -422,26 +587,55 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
       }
 
       const loc = countNonEmptyLines(text);
-      breakdown[resolveCategory(file.path)] += loc;
-
-      const ext = getFileExtension(file.path);
-      if (ext === "sol") {
-        if (ASSEMBLY_PATTERN.test(text)) {
-          assemblyUnsafeFileCount += 1;
-        }
-        if (!openZeppelinDetected && OPENZEPPELIN_PATTERN.test(text)) {
-          openZeppelinDetected = true;
-        }
-      } else if (ext === "rs" && UNSAFE_PATTERN.test(text)) {
-        assemblyUnsafeFileCount += 1;
+      const category = resolveCategory(file.path);
+      if (loc > 0) {
+        rawBreakdown[category] += loc;
       }
 
-      if (
-        !openZeppelinDetected &&
-        file.path.toLowerCase().endsWith("package.json") &&
-        packageJsonUsesOpenZeppelin(text)
-      ) {
-        openZeppelinDetected = true;
+      const ext = getFileExtension(file.path);
+      const lowerPath = file.path.toLowerCase();
+
+      if (!openZeppelinDetected) {
+        if (ext === "sol" && OPENZEPPELIN_PATTERN.test(text)) {
+          openZeppelinDetected = true;
+        } else if (
+          lowerPath.endsWith("package.json") &&
+          packageJsonUsesOpenZeppelin(text)
+        ) {
+          openZeppelinDetected = true;
+        }
+      }
+
+      const scopeExclusionReason = getScopeExclusionReason(file.path, text, {
+        includePaths,
+        excludePaths,
+        useDefaultScopeExclusions,
+      });
+
+      if (scopeExclusionReason) {
+        excludedFiles += 1;
+        if (loc > 0) {
+          excludedBreakdown[category] += loc;
+        }
+        exclusionReasonCounts[scopeExclusionReason] =
+          (exclusionReasonCounts[scopeExclusionReason] ?? 0) + 1;
+        processed += 1;
+        if (processed % 25 === 0 || processed === files.length) {
+          onProgress?.(
+            `Processed ${processed}/${files.length} files (skipped ${skipped}, excluded ${excludedFiles}).`,
+          );
+        }
+        return;
+      }
+
+      if (loc > 0) {
+        effectiveBreakdown[category] += loc;
+      }
+
+      if (ext === "sol" && ASSEMBLY_PATTERN.test(text)) {
+        assemblyUnsafeFileCount += 1;
+      } else if (ext === "rs" && UNSAFE_PATTERN.test(text)) {
+        assemblyUnsafeFileCount += 1;
       }
 
       if (!upgradabilityKeywordFound && UPGRADEABILITY_PATTERN.test(text)) {
@@ -452,12 +646,23 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
 
       if (processed % 25 === 0 || processed === files.length) {
         onProgress?.(
-          `Processed ${processed}/${files.length} files (skipped ${skipped}).`,
+          `Processed ${processed}/${files.length} files (skipped ${skipped}, excluded ${excludedFiles}).`,
         );
       }
     },
     8,
   );
+
+  const rawTotalLoc = totalLocFromBreakdown(rawBreakdown);
+  const effectiveTotalLoc = totalLocFromBreakdown(effectiveBreakdown);
+  const excludedTotalLoc = totalLocFromBreakdown(excludedBreakdown);
+
+  if (effectiveTotalLoc <= 0) {
+    throw createAppError(
+      "scope",
+      "No in-scope LOC found after exclusions. Adjust include/exclude paths.",
+    );
+  }
 
   let complexityMultiplier = 1.0;
   const modifiers = [];
@@ -490,7 +695,19 @@ async function getLocBreakdown(owner, repo, branch, onProgress, token) {
   }
 
   return {
-    breakdown,
+    breakdown: effectiveBreakdown,
+    rawBreakdown,
+    excludedBreakdown,
+    scopeSummary: {
+      includePaths,
+      excludePaths,
+      useDefaultScopeExclusions,
+      rawTotalLoc,
+      effectiveTotalLoc,
+      excludedTotalLoc,
+      excludedFiles,
+      exclusionReasonCounts,
+    },
     truncated: Boolean(treeData.truncated),
     complexity: {
       multiplier: complexityMultiplier,
@@ -679,6 +896,8 @@ export default function App() {
   const [repoUrl, setRepoUrl] = useState("");
   const [branch, setBranch] = useState("");
   const [githubToken, setGithubToken] = useState("");
+  const [includePathsInput, setIncludePathsInput] = useState("");
+  const [excludePathsInput, setExcludePathsInput] = useState("");
   const [reviewers, setReviewers] = useState(2);
   const [mode, setMode] = useState("standard");
   const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
@@ -772,6 +991,8 @@ export default function App() {
     setIsLoading(true);
     setStatusMessage("Fetching repository metadata...");
     const authToken = githubToken.trim();
+    const includePaths = parseScopePaths(includePathsInput);
+    const excludePaths = parseScopePaths(excludePathsInput);
 
     try {
       const repoData = await githubRequest(
@@ -791,6 +1012,11 @@ export default function App() {
         selectedBranch,
         (progressMessage) => setStatusMessage(progressMessage),
         authToken,
+        {
+          includePaths,
+          excludePaths,
+          useDefaultScopeExclusions: true,
+        },
       );
 
       const estimates = calculateEstimates(
@@ -805,12 +1031,23 @@ export default function App() {
         repo: parsedRepo.repo,
         branch: selectedBranch,
         locBreakdown: locData.breakdown,
+        rawLocBreakdown: locData.rawBreakdown,
+        excludedLocBreakdown: locData.excludedBreakdown,
+        scopeSummary: locData.scopeSummary,
         truncated: locData.truncated,
         complexity: locData.complexity,
         estimates,
       });
 
-      setStatusMessage("Impact estimate complete.");
+      setStatusMessage(
+        `Impact estimate complete. Using ${formatNumber(
+          locData.scopeSummary.effectiveTotalLoc,
+          0,
+        )} in-scope LOC (${formatNumber(
+          locData.scopeSummary.excludedTotalLoc,
+          0,
+        )} excluded).`,
+      );
 
       if (locData.truncated) {
         setBanner({
@@ -1008,6 +1245,44 @@ export default function App() {
               </div>
             </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                  htmlFor="include-paths"
+                >
+                  Include paths (optional)
+                </label>
+                <input
+                  id="include-paths"
+                  value={includePathsInput}
+                  onChange={(event) => setIncludePathsInput(event.target.value)}
+                  placeholder="contracts/core, pkg/vault"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                />
+              </div>
+              <div>
+                <label
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                  htmlFor="exclude-paths"
+                >
+                  Exclude paths (optional)
+                </label>
+                <input
+                  id="exclude-paths"
+                  value={excludePathsInput}
+                  onChange={(event) => setExcludePathsInput(event.target.value)}
+                  placeholder="contracts/test, scripts, interfaces"
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                />
+              </div>
+            </div>
+
+            <p className="text-xs text-[#8A786F]">
+              Default scope exclusions are active (tests, interfaces, mocks,
+              scripts, generated and vendor/build folders).
+            </p>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -1105,6 +1380,40 @@ export default function App() {
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <StatCard
+                  label="Raw LOC scanned"
+                  value={formatNumber(result.scopeSummary.rawTotalLoc, 0)}
+                />
+                <StatCard
+                  label="Excluded LOC"
+                  value={formatNumber(result.scopeSummary.excludedTotalLoc, 0)}
+                />
+                <StatCard
+                  label="Effective LOC used"
+                  value={formatNumber(result.scopeSummary.effectiveTotalLoc, 0)}
+                />
+              </div>
+
+              {Object.keys(result.scopeSummary.exclusionReasonCounts ?? {})
+                .length > 0 && (
+                <div className="mt-3 rounded-lg border border-[#EAE2DE] bg-[#FCFAF9] p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#8C7A72]">
+                    Exclusion summary
+                  </p>
+                  <ul className="mt-1.5 space-y-1 text-xs text-[#7A6961]">
+                    {Object.entries(result.scopeSummary.exclusionReasonCounts)
+                      .sort((a, b) => b[1] - a[1])
+                      .slice(0, 4)
+                      .map(([reason, count]) => (
+                        <li key={reason}>
+                          {reason}: {count} files
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <StatCard
                   label="Reviewer-weeks saved"
                   value={formatNumber(result.estimates.reviewerWeeksSaved)}
                 />
@@ -1118,7 +1427,10 @@ export default function App() {
                 />
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#8C7A72]">
+                Effective LOC breakdown (used in estimate)
+              </p>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 <BreakdownPill
                   label="Total"
                   value={result.estimates.totalLoc}
@@ -1167,6 +1479,14 @@ export default function App() {
                 <li>Solidity: 1000 LOC ≈ 1 reviewer-week.</li>
                 <li>Rust + C/C++: 1500 LOC ≈ 1 reviewer-week.</li>
                 <li>Other: 2000 LOC ≈ 1 reviewer-week.</li>
+                <li>
+                  Effective LOC excludes tests, interfaces, mocks, scripts, and
+                  generated/vendor/build directories by default.
+                </li>
+                <li>
+                  Optional include/exclude path filters can further narrow audit
+                  scope.
+                </li>
                 <li>
                   Complexity multiplier starts at 1.0 and modifies the estimate:
                   Final Weeks = Base Weeks × complexityMultiplier.

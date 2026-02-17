@@ -5,7 +5,7 @@ A landing-page calculator that estimates security review time and time saved usi
 ## What it does
 
 1. Fetches a **public GitHub repository**
-2. Counts non-empty LOC by category:
+2. Counts non-empty LOC by category (in-scope only):
    - Solidity
    - Rust
    - C/C++
@@ -35,6 +35,26 @@ A landing-page calculator that estimates security review time and time saved usi
   - Conservative: `20%`
   - Standard: `35%`
   - Strong: `50%`
+
+## Scope filtering (for more realistic estimates)
+
+By default, the calculator excludes common non-audit scope files:
+
+- Tests/specs (`test`, `tests`, `*.test.*`, `*.spec.*`, `*.t.sol`, etc.)
+- Interfaces (`interfaces/` directories and Solidity interface-only files)
+- Mocks/fixtures/examples/scripts
+- Generated/build/vendor directories (`artifacts`, `out`, `build`, `dist`, `generated`, `vendor`, etc.)
+
+The UI also supports:
+
+- **Include paths (optional):** only analyze matching subpaths
+- **Exclude paths (optional):** remove matching subpaths from analysis
+
+Results show:
+
+- Raw LOC scanned
+- Excluded LOC
+- Effective LOC used in estimation
 
 ## Run locally
 
