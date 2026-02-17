@@ -17,6 +17,30 @@ const MODE_REDUCTION = {
   strong: 0.5,
 };
 
+const MODE_SELECTION_CARDS = [
+  {
+    key: "conservative",
+    title: "Conservative",
+    percentLabel: "20%",
+    description:
+      "Automates initial recon and noise filtering. Catches basic issues so auditors can focus on logic immediately.",
+  },
+  {
+    key: "standard",
+    title: "Standard",
+    percentLabel: "35%",
+    description:
+      "The Recommended Balance. Pre-remediates common vulnerability patterns before human review begins.",
+  },
+  {
+    key: "strong",
+    title: "Strong",
+    percentLabel: "50%",
+    description:
+      "Full CI/CD Integration. Continuous verification on every PR ensures code arrives at the audit phase clean and verified.",
+  },
+];
+
 const C_CPP_EXTENSIONS = new Set([
   "c",
   "cc",
@@ -657,6 +681,7 @@ export default function App() {
   const [githubToken, setGithubToken] = useState("");
   const [reviewers, setReviewers] = useState(2);
   const [mode, setMode] = useState("standard");
+  const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
   const [statusMessage, setStatusMessage] = useState(
     "Enter a public GitHub repository URL to begin.",
   );
@@ -675,6 +700,13 @@ export default function App() {
       result.estimates.baselineCalendarWeeks,
     );
   }, [result]);
+
+  const selectedModeCard = useMemo(
+    () =>
+      MODE_SELECTION_CARDS.find((card) => card.key === mode) ??
+      MODE_SELECTION_CARDS[1],
+    [mode],
+  );
 
   useEffect(() => {
     let frameOne;
@@ -699,6 +731,15 @@ export default function App() {
       }
     };
   }, [result]);
+
+  useEffect(() => {
+    setModeDescriptionVisible(false);
+    const fadeTimer = setTimeout(() => {
+      setModeDescriptionVisible(true);
+    }, 90);
+
+    return () => clearTimeout(fadeTimer);
+  }, [mode]);
 
   async function handleEstimate(event) {
     event.preventDefault();
@@ -887,44 +928,62 @@ export default function App() {
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
-                  htmlFor="reviewers"
-                >
-                  Reviewers
-                </label>
-                <div className="relative">
-                  <Users className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="reviewers"
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={reviewers}
-                    onChange={(event) => setReviewers(event.target.value)}
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
-                  />
-                </div>
+            <div>
+              <label
+                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                htmlFor="reviewers"
+              >
+                Reviewers
+              </label>
+              <div className="relative">
+                <Users className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  id="reviewers"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={reviewers}
+                  onChange={(event) => setReviewers(event.target.value)}
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                />
               </div>
-              <div>
-                <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
-                  htmlFor="mode"
+            </div>
+
+            <div>
+              <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                Manual reduction mode
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {MODE_SELECTION_CARDS.map((card) => {
+                  const isSelected = mode === card.key;
+                  return (
+                    <button
+                      key={card.key}
+                      type="button"
+                      aria-pressed={isSelected}
+                      onClick={() => setMode(card.key)}
+                      className={`cursor-pointer rounded-xl border border-gray-200 bg-white p-4 text-left transition-all hover:border-orange-300 ${
+                        isSelected
+                          ? "border-orange-500 bg-orange-50/50 ring-1 ring-orange-500 shadow-sm"
+                          : ""
+                      }`}
+                    >
+                      <p className="font-bold text-gray-900">{card.title}</p>
+                      <p className="text-2xl font-bold tracking-tight text-orange-600">
+                        {card.percentLabel}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-3 h-24 rounded-lg bg-gray-50/70 px-4 py-3">
+                <p
+                  className={`text-sm leading-relaxed text-gray-600 transition-opacity duration-300 ${
+                    modeDescriptionVisible ? "opacity-100" : "opacity-0"
+                  }`}
                 >
-                  Manual reduction mode
-                </label>
-                <select
-                  id="mode"
-                  value={mode}
-                  onChange={(event) => setMode(event.target.value)}
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3 text-[#3E2B26] outline-none transition focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
-                >
-                  <option value="conservative">Conservative</option>
-                  <option value="standard">Standard</option>
-                  <option value="strong">Strong</option>
-                </select>
+                  {selectedModeCard.description}
+                </p>
               </div>
             </div>
 
