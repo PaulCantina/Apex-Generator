@@ -1,13 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  CaretDown,
-  GitBranch,
-  GithubLogo,
-  Key,
-} from "@phosphor-icons/react";
+import { useState } from "react";
+import { CaretDown, GithubLogo } from "@phosphor-icons/react";
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
-const PRIMARY_GRADIENT = "linear-gradient(to right, #E87C40, #CB5626)";
 const APEX_BUFFER_WEEKS = 0.2;
 
 const MODE_REDUCTION = {
@@ -15,30 +9,6 @@ const MODE_REDUCTION = {
   standard: 0.35,
   strong: 0.5,
 };
-
-const MODE_SELECTION_CARDS = [
-  {
-    key: "conservative",
-    title: "Conservative",
-    percentLabel: "20%",
-    description:
-      "Automates initial recon and noise filtering. Catches basic issues so auditors can focus on logic immediately.",
-  },
-  {
-    key: "standard",
-    title: "Standard",
-    percentLabel: "35%",
-    description:
-      "The Recommended Balance. Pre-remediates common vulnerability patterns before human review begins.",
-  },
-  {
-    key: "strong",
-    title: "Strong",
-    percentLabel: "50%",
-    description:
-      "Full CI/CD Integration. Continuous verification on every PR ensures code arrives at the audit phase clean and verified.",
-  },
-];
 
 const C_CPP_EXTENSIONS = new Set([
   "c",
@@ -306,13 +276,6 @@ function normalizeScopePath(path) {
     .replace(/\\/g, "/")
     .replace(/^\.?\/*/, "")
     .replace(/\/+$/, "");
-}
-
-function parseScopePaths(value) {
-  return value
-    .split(/[,\n]/)
-    .map((item) => normalizeScopePath(item))
-    .filter(Boolean);
 }
 
 function pathMatchesAnyPrefix(path, prefixes) {
@@ -974,14 +937,6 @@ function formatModifierImpact(impact) {
   return `${sign}${impact.toFixed(2)}`;
 }
 
-function toApexBarWidth(apexWeeks, manualWeeks) {
-  if (!manualWeeks || manualWeeks <= 0) {
-    return 14;
-  }
-  const ratio = (apexWeeks / manualWeeks) * 100;
-  return Math.min(100, Math.max(12, ratio));
-}
-
 function CantinaLogo() {
   return (
     <span className="flex items-center gap-2.5">
@@ -991,66 +946,10 @@ function CantinaLogo() {
         className="h-8 w-8"
         loading="eager"
       />
-      <span className="text-[15px] font-semibold tracking-[0.01em] text-[#EFE8E2]">
+      <span className="text-[15px] font-semibold tracking-[0.01em] text-white/90">
         Cantina
       </span>
     </span>
-  );
-}
-
-function FloatingNavbar() {
-  return (
-    <div className="sticky top-4 z-40 px-4 pt-4 sm:px-6">
-      <nav className="glass-navbar mx-auto h-14 w-full max-w-7xl rounded-full px-4 sm:px-6">
-        <div className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-        <div className="relative flex h-full items-center justify-between">
-          <a
-            href="/"
-            className="flex items-center transition-all duration-300 hover:opacity-80"
-          >
-            <CantinaLogo />
-          </a>
-
-          <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
-            <a
-              href="https://cantina.xyz/solutions/code-analyzer/enterprise"
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-full border border-[#E87C40]/35 bg-[#E87C40]/16 px-3 py-1 text-sm font-medium tracking-[0.01em] text-[#F5BC98] transition-all duration-300 hover:bg-[#E87C40]/24"
-            >
-              Apex
-            </a>
-            <a
-              href="#"
-              className="px-3 py-1 text-sm font-medium tracking-[0.01em] text-[#B3A8A1] transition-all duration-300 hover:text-[#F3EEEA]"
-            >
-              Services
-            </a>
-            <a
-              href="#"
-              className="px-3 py-1 text-sm font-medium tracking-[0.01em] text-[#B3A8A1] transition-all duration-300 hover:text-[#F3EEEA]"
-            >
-              Resources
-            </a>
-          </div>
-
-          <div className="ml-auto flex items-center gap-3">
-            <a
-              href="#"
-              className="hidden text-sm font-medium tracking-[0.01em] text-[#BCB1AA] transition-all duration-300 hover:text-[#F2ECE8] sm:inline-flex"
-            >
-              Login
-            </a>
-            <a
-              href="#calculator"
-              className="shimmer-button inline-flex items-center rounded-full border border-[#F8BE9D]/45 bg-gradient-to-r from-[#F6B18A] to-[#E87C40] px-5 py-2 text-sm font-semibold tracking-[0.01em] text-[#1C140F] shadow-[0_8px_22px_rgba(232,124,64,0.35),inset_0_1px_0_rgba(255,255,255,0.32)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:scale-[0.98]"
-            >
-              <span className="relative z-10">Run a Scan</span>
-            </a>
-          </div>
-        </div>
-      </nav>
-    </div>
   );
 }
 
@@ -1085,15 +984,6 @@ function BreakdownPill({ label, value }) {
 
 export default function App() {
   const [repoUrl, setRepoUrl] = useState("");
-  const [branch, setBranch] = useState("");
-  const [githubToken, setGithubToken] = useState("");
-  const [includePathsInput, setIncludePathsInput] = useState("");
-  const [excludePathsInput, setExcludePathsInput] = useState("");
-  const [smartContractOnly, setSmartContractOnly] = useState(true);
-  const [mode, setMode] = useState("standard");
-  const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
-  const [customizeOpen, setCustomizeOpen] = useState(false);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState(
     "Enter a public GitHub repository URL to begin.",
   );
@@ -1101,57 +991,8 @@ export default function App() {
   const [banner, setBanner] = useState(null);
   const [result, setResult] = useState(null);
   const [assumptionsOpen, setAssumptionsOpen] = useState(false);
-  const [barsLoaded, setBarsLoaded] = useState(false);
-
-  const apexBarWidth = useMemo(() => {
-    if (!result) {
-      return 14;
-    }
-    return toApexBarWidth(
-      result.estimates.apexCalendarWeeks,
-      result.estimates.baselineCalendarWeeks,
-    );
-  }, [result]);
-
-  const selectedModeCard = useMemo(
-    () =>
-      MODE_SELECTION_CARDS.find((card) => card.key === mode) ??
-      MODE_SELECTION_CARDS[1],
-    [mode],
-  );
-
-  useEffect(() => {
-    let frameOne;
-    let frameTwo;
-
-    if (!result) {
-      setBarsLoaded(false);
-      return undefined;
-    }
-
-    setBarsLoaded(false);
-    frameOne = requestAnimationFrame(() => {
-      frameTwo = requestAnimationFrame(() => setBarsLoaded(true));
-    });
-
-    return () => {
-      if (frameOne) {
-        cancelAnimationFrame(frameOne);
-      }
-      if (frameTwo) {
-        cancelAnimationFrame(frameTwo);
-      }
-    };
-  }, [result]);
-
-  useEffect(() => {
-    setModeDescriptionVisible(false);
-    const fadeTimer = setTimeout(() => {
-      setModeDescriptionVisible(true);
-    }, 90);
-
-    return () => clearTimeout(fadeTimer);
-  }, [mode]);
+  const mode = "standard";
+  const smartContractOnly = true;
 
   async function handleEstimate(event) {
     event.preventDefault();
@@ -1172,9 +1013,9 @@ export default function App() {
 
     setIsLoading(true);
     setStatusMessage("Fetching repository metadata...");
-    const authToken = githubToken.trim();
-    const includePaths = parseScopePaths(includePathsInput);
-    const excludePaths = parseScopePaths(excludePathsInput);
+    const authToken = "";
+    const includePaths = [];
+    const excludePaths = [];
 
     try {
       const repoData = await githubRequest(
@@ -1185,7 +1026,7 @@ export default function App() {
         throw createAppError("private", "Only public repositories are supported.");
       }
 
-      const selectedBranch = branch.trim() || repoData.default_branch;
+      const selectedBranch = repoData.default_branch;
       setStatusMessage(`Using branch "${selectedBranch}". Building LOC estimates...`);
 
       const locData = await getLocBreakdown(
@@ -1242,12 +1083,9 @@ export default function App() {
       const fallbackMessage = error.message || "Unable to estimate impact.";
       setStatusMessage(fallbackMessage);
       if (error?.code === "rate_limit") {
-        const rateLimitHelp = authToken
-          ? fallbackMessage
-          : `${fallbackMessage} Tip: add a GitHub token below to increase rate limits.`;
         setBanner({
           tone: "rate_limit",
-          message: rateLimitHelp,
+          message: fallbackMessage,
         });
       } else {
         setBanner({
@@ -1261,387 +1099,156 @@ export default function App() {
   }
 
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden bg-[#0F1216] text-[#ECE8E5]">
-      <div className="background-canvas pointer-events-none fixed inset-0">
-        <div className="background-grid absolute inset-0" />
-        <div className="background-orb background-orb--one" />
-        <div className="background-orb background-orb--two" />
-        <div className="background-orb background-orb--three" />
-        <div className="background-sweep" />
-      </div>
+    <div className="min-h-screen bg-apex-black text-white">
+      <section className="relative min-h-screen overflow-hidden bg-hero">
+        <div className="absolute inset-0 bg-noise opacity-5" />
+        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-apex-orange0/25 blur-3xl animate-[pulse_9s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -right-24 bottom-24 h-80 w-80 rounded-full bg-apex-orange1/20 blur-3xl animate-[pulse_11s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-apex-black/20 to-apex-black" />
 
-      <main className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#080B10]/90 shadow-[0_20px_40px_rgba(0,0,0,0.45)] backdrop-blur-[2px]">
-          <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,#6f5f55_1px,transparent_1px),linear-gradient(to_bottom,#6f5f55_1px,transparent_1px)] [background-size:26px_26px]" />
-          <div className="pointer-events-none absolute left-0 right-0 top-0 h-56 bg-gradient-to-b from-[#131821]/85 to-transparent" />
-          <div className="pointer-events-none absolute -right-16 top-12 h-64 w-64 rounded-full bg-gradient-to-tr from-[#F4A27E]/18 to-transparent blur-3xl" />
-
-          <FloatingNavbar />
-
-          <section className="relative px-6 pb-12 pt-10 text-center md:px-14 md:pt-16">
-            <div className="mx-auto max-w-3xl space-y-6">
-              <span className="inline-flex items-center rounded-full border border-[#E87C40]/45 bg-[#E87C40]/14 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#F5B292]">
-                APEX SECURITY IMPACT
-              </span>
-              <h1 className="mx-auto max-w-[16ch] text-4xl font-semibold leading-none tracking-tighter text-[#F4EFEC] md:text-6xl">
-                One-click audit impact estimation
-              </h1>
-              <p className="mx-auto max-w-[64ch] text-base leading-relaxed text-[#B8ADA6]">
-                Estimate your time to audit readiness with Apex - one click away
-                from a clear, scope-aware timeline.
-              </p>
-            </div>
-          </section>
-
-          <section
-            id="calculator"
-            className="relative mx-4 mb-4 overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md md:mx-6 md:mb-6 md:p-8"
-          >
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,#65584f_1px,transparent_1px),linear-gradient(to_bottom,#65584f_1px,transparent_1px)] [background-size:24px_24px]" />
-            <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#E87C40]/18 to-transparent blur-2xl" />
-          </div>
-
-          <div className="relative z-10">
-          {banner && (
-            <div
-              className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
-                banner.tone === "rate_limit"
-                  ? "border-[#A75A32]/70 bg-[#2A1E17]/80 text-[#F1BC9A]"
-                  : "border-[#6A4B3D] bg-[#241A16]/85 text-[#D5B09B]"
-              }`}
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-8">
+          <header className="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl sm:px-6">
+            <a
+              href="/"
+              className="flex items-center transition-opacity duration-300 hover:opacity-80"
             >
-              {banner.message}
-            </div>
-          )}
-
-          <form className="space-y-4" onSubmit={handleEstimate}>
-            <div>
-              <label
-                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                htmlFor="repo-url"
+              <CantinaLogo />
+            </a>
+            <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-apex-ink/70 p-1 text-sm text-white/65 md:flex">
+              <a
+                href="https://cantina.xyz/solutions/code-analyzer/enterprise"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full bg-white/10 px-3 py-1.5 text-white/90 transition-colors duration-300 hover:bg-white/20"
               >
-                GitHub repository URL (public)
-              </label>
-              <div className="relative">
-                <GithubLogo
-                  size={16}
-                  weight="regular"
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  id="repo-url"
-                  value={repoUrl}
-                  onChange={(event) => setRepoUrl(event.target.value)}
-                  placeholder="https://github.com/owner/repo"
-                  className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/[0.02]">
-              <button
-                type="button"
-                onClick={() => setCustomizeOpen((open) => !open)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#C8BDB6] transition-colors hover:text-[#F2ECE8]"
+                Apex
+              </a>
+              <a
+                href="#"
+                className="rounded-full px-3 py-1.5 transition-colors duration-300 hover:bg-white/10 hover:text-white"
               >
-                <span>Customize estimate (branch, mode, scope)</span>
-                <CaretDown
-                  size={16}
-                  weight="regular"
-                  className={`transition-transform duration-200 ${
-                    customizeOpen ? "rotate-180" : ""
+                Services
+              </a>
+              <a
+                href="#"
+                className="rounded-full px-3 py-1.5 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+              >
+                Resources
+              </a>
+            </nav>
+          </header>
+
+          <main className="flex flex-1 items-center py-10 sm:py-14">
+            <section
+              id="calculator"
+              className="mx-auto w-full max-w-4xl rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-glow backdrop-blur-xl sm:p-10"
+            >
+              <span className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70">
+                <span className="h-2 w-2 rounded-full bg-gradient-to-br from-apex-orange0 to-apex-orange1 ring-4 ring-apex-orange0/20" />
+                Apex Impact Calculator
+              </span>
+
+              <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+                One click to audit readiness
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm text-white/70 sm:text-base">
+                Estimate time to audit readiness with Apex, just one click away.
+              </p>
+
+              {banner && (
+                <div
+                  className={`mt-6 rounded-xl border px-4 py-3 text-sm ${
+                    banner.tone === "rate_limit"
+                      ? "border-apex-orange1/45 bg-apex-orange1/15 text-apex-orange1"
+                      : "border-white/20 bg-white/10 text-white/80"
                   }`}
-                />
-              </button>
-
-              {customizeOpen && (
-                <div className="space-y-4 border-t border-white/10 px-4 pb-4 pt-4">
-                  <div>
-                    <label
-                      className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                      htmlFor="branch"
-                    >
-                      Branch (optional)
-                    </label>
-                    <div className="relative">
-                      <GitBranch
-                        size={16}
-                        weight="regular"
-                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                      />
-                      <input
-                        id="branch"
-                        value={branch}
-                        onChange={(event) => setBranch(event.target.value)}
-                        placeholder="Default branch"
-                        className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]">
-                      Manual reduction mode
-                    </p>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.15fr_1fr_1fr]">
-                      {MODE_SELECTION_CARDS.map((card) => {
-                        const isSelected = mode === card.key;
-                        return (
-                          <button
-                            key={card.key}
-                            type="button"
-                            aria-pressed={isSelected}
-                            onClick={() => setMode(card.key)}
-                            className={`cursor-pointer rounded-xl border border-white/15 bg-[#10151c] p-4 text-left transition-all duration-300 hover:border-[#E87C40]/60 active:scale-[0.98] ${
-                              isSelected
-                                ? "border-[#E87C40] bg-[#281E18] ring-1 ring-[#E87C40] shadow-[0_12px_24px_rgba(0,0,0,0.25)]"
-                                : ""
-                            }`}
-                          >
-                            <p className="font-bold text-[#F3EEEA]">{card.title}</p>
-                            <p className="text-2xl font-bold tracking-tight text-[#F1A67D]">
-                              {card.percentLabel}
-                            </p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="mt-3 h-24 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
-                      <p
-                        className={`text-sm leading-relaxed text-[#B8ADA6] transition-opacity duration-300 ${
-                          modeDescriptionVisible ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        {selectedModeCard.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02]">
-                    <button
-                      type="button"
-                      onClick={() => setAdvancedOpen((open) => !open)}
-                      className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#C8BDB6] transition-colors hover:text-[#F2ECE8]"
-                    >
-                      <span>Advanced scope controls</span>
-                      <CaretDown
-                        size={16}
-                        weight="regular"
-                        className={`transition-transform duration-200 ${
-                          advancedOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    {advancedOpen && (
-                      <div className="space-y-4 border-t border-white/10 px-4 pb-4 pt-4">
-                        <div>
-                          <label
-                            className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                            htmlFor="github-token"
-                          >
-                            GitHub token (optional for higher API limits)
-                          </label>
-                          <div className="relative">
-                            <Key
-                              size={16}
-                              weight="regular"
-                              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                            />
-                            <input
-                              id="github-token"
-                              type="password"
-                              autoComplete="off"
-                              value={githubToken}
-                              onChange={(event) => setGithubToken(event.target.value)}
-                              placeholder="Enter a valid PAT (kept local in this browser session)"
-                              className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div>
-                            <label
-                              className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                              htmlFor="include-paths"
-                            >
-                              Include paths (optional)
-                            </label>
-                            <input
-                              id="include-paths"
-                              value={includePathsInput}
-                              onChange={(event) => setIncludePathsInput(event.target.value)}
-                              placeholder="contracts/core, pkg/vault"
-                              className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                            />
-                          </div>
-                          <div>
-                            <label
-                              className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                              htmlFor="exclude-paths"
-                            >
-                              Exclude paths (optional)
-                            </label>
-                            <input
-                              id="exclude-paths"
-                              value={excludePathsInput}
-                              onChange={(event) => setExcludePathsInput(event.target.value)}
-                              placeholder="contracts/test, scripts, interfaces"
-                              className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                            />
-                          </div>
-                        </div>
-
-                        <p className="text-xs text-[#AFA39C]">
-                          Default scope exclusions are active (tests,
-                          interfaces, mocks, scripts, generated and
-                          vendor/build folders).
-                        </p>
-
-                        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3">
-                          <input
-                            type="checkbox"
-                            checked={smartContractOnly}
-                            onChange={(event) => setSmartContractOnly(event.target.checked)}
-                            className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#10151c] text-[#E87C40] focus:ring-[#E87C40]/30"
-                          />
-                          <span>
-                            <span className="text-sm font-medium text-[#E6DFDA]">
-                              Smart-contract-only mode (default on)
-                            </span>
-                            <span className="mt-1 block text-xs text-[#AFA39C]">
-                              Excludes the “Other” language bucket from in-scope
-                              LOC. Recommended for pure protocol contract audit
-                              scoping.
-                            </span>
-                          </span>
-                        </label>
-                      </div>
-                    )}
-                  </div>
+                >
+                  {banner.message}
                 </div>
               )}
-            </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#E87C40] to-[#CB5626] px-5 py-3 text-sm font-medium tracking-wide text-[#1C1411] shadow-[inset_0px_1px_0px_rgba(255,255,255,0.2)] transition duration-200 hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isLoading ? "Calculating..." : "Calculate My Savings"}
-            </button>
-          </form>
-
-          <p className="mt-4 text-sm text-[#B8ADA6]">{statusMessage}</p>
-
-          {isLoading && (
-            <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-              <div className="h-4 w-40 animate-pulse rounded bg-white/10" />
-              <div className="h-3 w-full animate-pulse rounded bg-white/10" />
-              <div className="h-3 w-10/12 animate-pulse rounded bg-white/10" />
-              <div className="h-8 w-full animate-pulse rounded-lg bg-white/10" />
-              <div className="h-8 w-4/5 animate-pulse rounded-lg bg-white/10" />
-            </div>
-          )}
-
-          {!isLoading && !result && (
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
-              <p className="text-sm font-medium text-[#F0EAE6]">
-                Awaiting repository input.
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-[#B6ACA6]">
-                Add a public GitHub URL and run the estimate to generate scoped
-                review weeks, complexity modifiers, and Apex savings.
-              </p>
-            </div>
-          )}
-
-          {result && (
-            <div className="mt-8 border-t border-white/10 pt-8">
-              <div className="space-y-4">
+              <form className="mt-7 space-y-4" onSubmit={handleEstimate}>
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-wide text-[#B5AAA3]">
-                    Visual Comparison
-                  </p>
-                  <p className="mt-1 text-sm text-[#AFA39C]">
-                    {result.owner}/{result.repo} • Branch {result.branch}
-                  </p>
-                </div>
-
-                <div>
-                  <div className="mb-2 flex items-center justify-between text-sm font-medium text-[#D1C7C1]">
-                    <span>Manual Review</span>
-                    <span>
-                      Est. {weekLabel(result.estimates.baselineCalendarWeeks)}
-                    </span>
-                  </div>
-                  <div className="h-4 w-full overflow-hidden rounded-lg bg-[#1F262F]">
-                    <div
-                      className="h-full origin-left rounded-lg bg-gradient-to-r from-[#69727D] to-[#515B67] transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
-                      style={{ transform: barsLoaded ? "scaleX(1)" : "scaleX(0)" }}
+                  <label
+                    className="mb-2 block text-xs font-semibold uppercase tracking-[0.13em] text-white/55"
+                    htmlFor="repo-url"
+                  >
+                    GitHub repository URL (public)
+                  </label>
+                  <div className="relative">
+                    <GithubLogo
+                      size={18}
+                      weight="regular"
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50"
+                    />
+                    <input
+                      id="repo-url"
+                      value={repoUrl}
+                      onChange={(event) => setRepoUrl(event.target.value)}
+                      placeholder="https://github.com/owner/repo"
+                      className="w-full rounded-[14px] border border-white/15 bg-apex-ink/80 py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-white/40 focus:border-apex-orange0 focus:ring-2 focus:ring-apex-orange0/35"
+                      required
                     />
                   </div>
                 </div>
 
-                <div>
-                  <div className="mb-2 flex items-center justify-between text-sm font-medium text-[#D1C7C1]">
-                    <span>With Apex</span>
-                    <span>
-                      Est. {weekLabel(result.estimates.apexCalendarWeeks)}
-                    </span>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full rounded-[14px] bg-gradient-to-br from-apex-orange0 to-apex-orange1 py-3 font-semibold text-apex-black shadow-glow transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-65"
+                >
+                  {isLoading ? "Calculating..." : "Calculate My Savings"}
+                </button>
+              </form>
+
+              <p className="mt-3 text-sm text-white/60">{statusMessage}</p>
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-apex-black/55 p-4">
+                <p className="text-xs uppercase tracking-[0.14em] text-white/45">
+                  Estimate preview
+                </p>
+                <p className="mt-1 text-xs text-white/50">
+                  {result
+                    ? `${result.owner}/${result.repo} • ${result.branch}`
+                    : "Run an estimate to preview manual weeks, Apex weeks, and projected savings."}
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <p className="text-xs uppercase tracking-wide text-white/50">
+                      Manual
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-white">
+                      {result
+                        ? weekLabel(result.estimates.baselineCalendarWeeks)
+                        : "--"}
+                    </p>
                   </div>
-                  <div className="h-4 w-full overflow-hidden rounded-lg bg-[#1F262F]">
-                    <div style={{ width: `${apexBarWidth}%` }} className="h-full">
-                      <div
-                        className="h-full origin-left rounded-lg transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
-                        style={{
-                          transform: barsLoaded ? "scaleX(1)" : "scaleX(0)",
-                          backgroundImage: PRIMARY_GRADIENT,
-                        }}
-                      />
-                    </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <p className="text-xs uppercase tracking-wide text-white/50">
+                      With Apex
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-white">
+                      {result ? weekLabel(result.estimates.apexCalendarWeeks) : "--"}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                    <p className="text-xs uppercase tracking-wide text-white/50">
+                      Saved
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-white">
+                      {result
+                        ? `${formatNumber(result.estimates.percentSaved)}%`
+                        : "--"}
+                    </p>
                   </div>
                 </div>
-
-                <p className="text-sm text-[#B7ADA7]">
-                  Apex timeline uses a fixed 0.2-week buffer (~1 day) with{" "}
-                  <span className="font-medium capitalize">{mode}</span> mode
-                  applied.
-                </p>
               </div>
+            </section>
+          </main>
+        </div>
+      </section>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
-                <StatCard
-                  label="Weeks saved"
-                  value={formatNumber(result.estimates.weeksSaved)}
-                />
-                <StatCard
-                  label="Apex estimate (weeks)"
-                  value={formatNumber(result.estimates.apexWeeks)}
-                />
-                <StatCard
-                  label="Percent saved"
-                  value={`${formatNumber(result.estimates.percentSaved)}%`}
-                />
-              </div>
-
-              <div className="mt-7 rounded-xl border border-[#3F2B23] bg-[#1A1411] p-5">
-                <p className="text-lg font-semibold text-[#F2E9E4]">
-                  Ready to speed up your audit?
-                </p>
-                <button className="mt-4 rounded-lg border border-[#E87C40]/60 px-5 py-2.5 text-sm font-semibold text-[#F4A27E] transition hover:bg-[#E87C40]/20 hover:text-[#F9C4A8] active:scale-[0.98]">
-                  Start Your Scan Now
-                </button>
-              </div>
-            </div>
-          )}
-          </div>
-        </section>
-        </section>
-
+      <main className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         {result && (
           <section className="mt-8 grid gap-6 md:grid-cols-[1.15fr_0.85fr]">
             <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6">
