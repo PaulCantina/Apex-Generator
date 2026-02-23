@@ -4,9 +4,6 @@ import {
   GitBranch,
   GithubLogo,
   Key,
-  Pulse,
-  ShieldCheck,
-  Timer,
 } from "@phosphor-icons/react";
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
@@ -994,16 +991,19 @@ function CantinaLogo() {
         className="h-8 w-8"
         loading="eager"
       />
-      <span className="text-base font-semibold text-[#F2EEEB]">Cantina</span>
+      <span className="text-[15px] font-semibold tracking-[0.01em] text-[#EFE8E2]">
+        Cantina
+      </span>
     </span>
   );
 }
 
 function FloatingNavbar() {
   return (
-    <div className="px-4 pt-4 sm:px-6">
-      <nav className="mx-auto h-14 w-full max-w-7xl rounded-full border border-white/10 bg-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-        <div className="relative flex h-full items-center justify-between px-4 sm:px-6">
+    <div className="sticky top-4 z-40 px-4 pt-4 sm:px-6">
+      <nav className="glass-navbar mx-auto h-14 w-full max-w-7xl rounded-full px-4 sm:px-6">
+        <div className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        <div className="relative flex h-full items-center justify-between">
           <a
             href="/"
             className="flex items-center transition-all duration-300 hover:opacity-80"
@@ -1016,19 +1016,19 @@ function FloatingNavbar() {
               href="https://cantina.xyz/solutions/code-analyzer/enterprise"
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-[#E87C40]/18 px-3 py-1 text-sm font-medium text-[#F4A27E] transition-all duration-300"
+              className="rounded-full border border-[#E87C40]/35 bg-[#E87C40]/16 px-3 py-1 text-sm font-medium tracking-[0.01em] text-[#F5BC98] transition-all duration-300 hover:bg-[#E87C40]/24"
             >
               Apex
             </a>
             <a
               href="#"
-              className="px-3 py-1 text-sm font-medium text-[#A89C95] transition-all duration-300 hover:text-[#F3EEEA]"
+              className="px-3 py-1 text-sm font-medium tracking-[0.01em] text-[#B3A8A1] transition-all duration-300 hover:text-[#F3EEEA]"
             >
               Services
             </a>
             <a
               href="#"
-              className="px-3 py-1 text-sm font-medium text-[#A89C95] transition-all duration-300 hover:text-[#F3EEEA]"
+              className="px-3 py-1 text-sm font-medium tracking-[0.01em] text-[#B3A8A1] transition-all duration-300 hover:text-[#F3EEEA]"
             >
               Resources
             </a>
@@ -1037,13 +1037,13 @@ function FloatingNavbar() {
           <div className="ml-auto flex items-center gap-3">
             <a
               href="#"
-              className="hidden text-sm font-medium text-[#AEA39B] transition-all duration-300 hover:text-[#F2ECE8] sm:inline-flex"
+              className="hidden text-sm font-medium tracking-[0.01em] text-[#BCB1AA] transition-all duration-300 hover:text-[#F2ECE8] sm:inline-flex"
             >
               Login
             </a>
             <a
               href="#calculator"
-              className="shimmer-button inline-flex items-center rounded-full bg-[#F4A27E] px-5 py-2 text-sm font-medium text-[#221915] transition-all duration-300 hover:brightness-105 active:scale-[0.98]"
+              className="shimmer-button inline-flex items-center rounded-full border border-[#F8BE9D]/45 bg-gradient-to-r from-[#F6B18A] to-[#E87C40] px-5 py-2 text-sm font-semibold tracking-[0.01em] text-[#1C140F] shadow-[0_8px_22px_rgba(232,124,64,0.35),inset_0_1px_0_rgba(255,255,255,0.32)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:scale-[0.98]"
             >
               <span className="relative z-10">Run a Scan</span>
             </a>
@@ -1262,20 +1262,24 @@ export default function App() {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-[#0F1216] text-[#ECE8E5]">
-      <div className="pointer-events-none fixed inset-0 opacity-[0.08] [background-image:radial-gradient(#6a5b52_1px,transparent_1px)] [background-size:22px_22px]" />
-      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#E87C40]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 top-24 h-80 w-80 rounded-full bg-[#F4A27E]/10 blur-3xl" />
+      <div className="background-canvas pointer-events-none fixed inset-0">
+        <div className="background-grid absolute inset-0" />
+        <div className="background-orb background-orb--one" />
+        <div className="background-orb background-orb--two" />
+        <div className="background-orb background-orb--three" />
+        <div className="background-sweep" />
+      </div>
 
       <main className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#080B10] shadow-[0_20px_40px_rgba(0,0,0,0.45)]">
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#080B10]/90 shadow-[0_20px_40px_rgba(0,0,0,0.45)] backdrop-blur-[2px]">
           <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,#6f5f55_1px,transparent_1px),linear-gradient(to_bottom,#6f5f55_1px,transparent_1px)] [background-size:26px_26px]" />
-          <div className="pointer-events-none absolute left-0 right-0 top-0 h-56 bg-gradient-to-b from-[#131821]/80 to-transparent" />
+          <div className="pointer-events-none absolute left-0 right-0 top-0 h-56 bg-gradient-to-b from-[#131821]/85 to-transparent" />
           <div className="pointer-events-none absolute -right-16 top-12 h-64 w-64 rounded-full bg-gradient-to-tr from-[#F4A27E]/18 to-transparent blur-3xl" />
 
           <FloatingNavbar />
 
           <section className="relative px-6 pb-12 pt-10 text-center md:px-14 md:pt-16">
-            <div className="mx-auto max-w-3xl space-y-5">
+            <div className="mx-auto max-w-3xl space-y-6">
               <span className="inline-flex items-center rounded-full border border-[#E87C40]/45 bg-[#E87C40]/14 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#F5B292]">
                 APEX SECURITY IMPACT
               </span>
@@ -1283,24 +1287,9 @@ export default function App() {
                 One-click audit impact estimation
               </h1>
               <p className="mx-auto max-w-[64ch] text-base leading-relaxed text-[#B8ADA6]">
-                Estimate in-scope manual review weeks with strict default
-                exclusions, comment-aware SLOC counting, and transparent
-                complexity modifiers.
+                Estimate your time to audit readiness with Apex - one click away
+                from a clear, scope-aware timeline.
               </p>
-              <div className="flex flex-wrap justify-center gap-3 text-sm text-[#C6BBB4]">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                  <ShieldCheck size={16} weight="regular" className="text-[#F2AB87]" />
-                  Scope-safe defaults
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                  <Timer size={16} weight="regular" className="text-[#F2AB87]" />
-                  0.2 week Apex buffer
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                  <Pulse size={16} weight="regular" className="text-[#F2AB87]" />
-                  Comment-aware SLOC
-                </span>
-              </div>
             </div>
           </section>
 
