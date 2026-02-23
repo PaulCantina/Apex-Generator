@@ -994,15 +994,15 @@ function CantinaLogo() {
         className="h-8 w-8"
         loading="eager"
       />
-      <span className="text-base font-semibold text-[#2D2521]">Cantina</span>
+      <span className="text-base font-semibold text-[#F2EEEB]">Cantina</span>
     </span>
   );
 }
 
 function FloatingNavbar() {
   return (
-    <div className="fixed inset-x-0 top-4 z-50 px-3 sm:px-6">
-      <nav className="mx-auto h-16 w-full max-w-7xl rounded-full border border-white/30 bg-white/75 shadow-[0_8px_30px_rgba(72,43,28,0.08)] backdrop-blur-xl">
+    <div className="px-4 pt-4 sm:px-6">
+      <nav className="mx-auto h-14 w-full max-w-7xl rounded-full border border-white/10 bg-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
         <div className="relative flex h-full items-center justify-between px-4 sm:px-6">
           <a
             href="/"
@@ -1016,19 +1016,19 @@ function FloatingNavbar() {
               href="https://cantina.xyz/solutions/code-analyzer/enterprise"
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-[#E87C40]/12 px-3 py-1 text-sm font-medium text-[#A04B24] transition-all duration-300"
+              className="rounded-full bg-[#E87C40]/18 px-3 py-1 text-sm font-medium text-[#F4A27E] transition-all duration-300"
             >
               Apex
             </a>
             <a
               href="#"
-              className="px-3 py-1 text-sm font-medium text-[#7D6D66] transition-all duration-300 hover:text-[#2D2521]"
+              className="px-3 py-1 text-sm font-medium text-[#A89C95] transition-all duration-300 hover:text-[#F3EEEA]"
             >
               Services
             </a>
             <a
               href="#"
-              className="px-3 py-1 text-sm font-medium text-[#7D6D66] transition-all duration-300 hover:text-[#2D2521]"
+              className="px-3 py-1 text-sm font-medium text-[#A89C95] transition-all duration-300 hover:text-[#F3EEEA]"
             >
               Resources
             </a>
@@ -1037,13 +1037,13 @@ function FloatingNavbar() {
           <div className="ml-auto flex items-center gap-3">
             <a
               href="#"
-              className="hidden text-sm font-medium text-[#74645D] transition-all duration-300 hover:text-[#2D2521] sm:inline-flex"
+              className="hidden text-sm font-medium text-[#AEA39B] transition-all duration-300 hover:text-[#F2ECE8] sm:inline-flex"
             >
               Login
             </a>
             <a
               href="#calculator"
-              className="shimmer-button inline-flex items-center rounded-full bg-[#2D2521] px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-[#3A2F29] active:scale-[0.98]"
+              className="shimmer-button inline-flex items-center rounded-full bg-[#F4A27E] px-5 py-2 text-sm font-medium text-[#221915] transition-all duration-300 hover:brightness-105 active:scale-[0.98]"
             >
               <span className="relative z-10">Run a Scan</span>
             </a>
@@ -1056,14 +1056,14 @@ function FloatingNavbar() {
 
 function StatCard({ label, value }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-[#EDE6E2] bg-[linear-gradient(165deg,#ffffff_0%,#fdf9f7_100%)] p-4">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,#d8dde6_1px,transparent_1px),linear-gradient(to_bottom,#d8dde6_1px,transparent_1px)] [background-size:18px_18px]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#E8C1AF] to-transparent" />
+    <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#14181e] p-4">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,#6f5f55_1px,transparent_1px),linear-gradient(to_bottom,#6f5f55_1px,transparent_1px)] [background-size:18px_18px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#E8A17D] to-transparent" />
       <div className="relative">
-        <p className="text-xs font-medium uppercase tracking-wide text-[#8A786F]">
+        <p className="text-xs font-medium uppercase tracking-wide text-[#AFA49D]">
           {label}
         </p>
-        <p className="mt-2 text-xl font-semibold text-[#3E2B26]">{value}</p>
+        <p className="mt-2 text-xl font-semibold text-[#F4EFEB]">{value}</p>
       </div>
     </div>
   );
@@ -1071,11 +1071,11 @@ function StatCard({ label, value }) {
 
 function BreakdownPill({ label, value }) {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-[#EEE7E3] bg-[linear-gradient(165deg,#fdfbfa_0%,#f7f2ef_100%)] px-3 py-2">
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#E87C40]/10 to-transparent" />
+    <div className="relative overflow-hidden rounded-lg border border-white/10 bg-[#12161c] px-3 py-2">
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#E87C40]/16 to-transparent" />
       <div className="relative">
-        <p className="text-xs uppercase tracking-wide text-[#8A786F]">{label}</p>
-        <p className="mt-1 text-sm font-semibold text-[#3E2B26]">
+        <p className="text-xs uppercase tracking-wide text-[#AFA49D]">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-[#F2ECE8]">
           {formatNumber(value, 0)} LOC
         </p>
       </div>
@@ -1259,78 +1259,56 @@ export default function App() {
   }
 
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden bg-[#f9f8f6] text-[#3E2B26]">
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-80 opacity-[0.06] [background-image:radial-gradient(#8c715f_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,rgba(62,43,38,1),rgba(62,43,38,0))]" />
-      <div className="pointer-events-none absolute -right-28 -top-40 h-[32rem] w-[32rem] rounded-full bg-gradient-to-tr from-[#F4A27E]/20 via-[#E87C40]/12 to-transparent blur-3xl" />
+    <div className="relative min-h-[100dvh] overflow-hidden bg-[#0F1216] text-[#ECE8E5]">
+      <div className="pointer-events-none fixed inset-0 opacity-[0.08] [background-image:radial-gradient(#6a5b52_1px,transparent_1px)] [background-size:22px_22px]" />
+      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#E87C40]/12 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 top-24 h-80 w-80 rounded-full bg-[#F4A27E]/10 blur-3xl" />
 
-      <FloatingNavbar />
+      <main className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#080B10] shadow-[0_20px_40px_rgba(0,0,0,0.45)]">
+          <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,#6f5f55_1px,transparent_1px),linear-gradient(to_bottom,#6f5f55_1px,transparent_1px)] [background-size:26px_26px]" />
+          <div className="pointer-events-none absolute left-0 right-0 top-0 h-56 bg-gradient-to-b from-[#131821]/80 to-transparent" />
+          <div className="pointer-events-none absolute -right-16 top-12 h-64 w-64 rounded-full bg-gradient-to-tr from-[#F4A27E]/18 to-transparent blur-3xl" />
 
-      <main className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-28 sm:px-6 md:pt-36 lg:px-8">
-        <section className="grid items-end gap-10 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-6">
-            <span className="inline-flex items-center rounded-full border border-[#E0C9BD] bg-[#FFF4ED] px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#A45028]">
-              APEX SECURITY IMPACT
-            </span>
-            <h1 className="max-w-[16ch] text-4xl font-semibold leading-none tracking-tighter text-[#2E2521] md:text-6xl">
-              Accelerate Your Audit Readiness
-            </h1>
-            <p className="max-w-[62ch] text-base leading-relaxed text-[#6D5E57]">
-              Estimate in-scope security review weeks with stricter audit
-              filtering and calibrated code-line counting. The model excludes
-              tests, interface-heavy files, and non-audit packages by default.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-[#6D5E57]">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#E5D6CF] bg-white/80 px-3 py-1.5">
-                <ShieldCheck size={16} weight="regular" className="text-[#A45028]" />
-                Scope-safe defaults
+          <FloatingNavbar />
+
+          <section className="relative px-6 pb-12 pt-10 text-center md:px-14 md:pt-16">
+            <div className="mx-auto max-w-3xl space-y-5">
+              <span className="inline-flex items-center rounded-full border border-[#E87C40]/45 bg-[#E87C40]/14 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#F5B292]">
+                APEX SECURITY IMPACT
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#E5D6CF] bg-white/80 px-3 py-1.5">
-                <Timer size={16} weight="regular" className="text-[#A45028]" />
-                0.2 week Apex buffer
-              </span>
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-[#E9DDD7] bg-white/90 p-8 shadow-[0_20px_40px_-15px_rgba(72,43,28,0.08)]">
-            <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,#cdb5a8_1px,transparent_1px),linear-gradient(to_bottom,#cdb5a8_1px,transparent_1px)] [background-size:22px_22px]" />
-            <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-tr from-[#E87C40]/16 to-transparent blur-2xl" />
-            <div className="relative space-y-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8E7567]">
-                Live model behavior
+              <h1 className="mx-auto max-w-[16ch] text-4xl font-semibold leading-none tracking-tighter text-[#F4EFEC] md:text-6xl">
+                One-click audit impact estimation
+              </h1>
+              <p className="mx-auto max-w-[64ch] text-base leading-relaxed text-[#B8ADA6]">
+                Estimate in-scope manual review weeks with strict default
+                exclusions, comment-aware SLOC counting, and transparent
+                complexity modifiers.
               </p>
-              <div className="space-y-3 rounded-2xl border border-[#E9DDD7] bg-[#FDFBF9] p-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#725E55]">Audit scope calibration</span>
-                  <span className="font-medium text-[#2E2521]">Active</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[#EADFD9]">
-                  <div className="h-full w-[78%] rounded-full bg-[linear-gradient(to_right,#F4A27E,#E87C40,#CB5626,#8F431D)]" />
-                </div>
-              </div>
-              <div className="space-y-3 rounded-2xl border border-[#E9DDD7] bg-[#FDFBF9] p-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#725E55]">Estimator response</span>
-                  <span className="inline-flex items-center gap-1 font-medium text-[#2E2521]">
-                    <Pulse size={14} weight="bold" className="animate-pulse text-[#A45028]" />
-                    Stable
-                  </span>
-                </div>
-                <p className="text-sm leading-relaxed text-[#7B6860]">
-                  Mode-adjusted output with complexity multipliers and SLOC
-                  filtering for audit-scope realism.
-                </p>
+              <div className="flex flex-wrap justify-center gap-3 text-sm text-[#C6BBB4]">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                  <ShieldCheck size={16} weight="regular" className="text-[#F2AB87]" />
+                  Scope-safe defaults
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                  <Timer size={16} weight="regular" className="text-[#F2AB87]" />
+                  0.2 week Apex buffer
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                  <Pulse size={16} weight="regular" className="text-[#F2AB87]" />
+                  Comment-aware SLOC
+                </span>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section
-          id="calculator"
-          className="relative mt-12 overflow-hidden rounded-[2.5rem] border border-[#ECE1DB] bg-white p-8 shadow-[0_20px_40px_-15px_rgba(72,43,28,0.08)]"
-        >
+          <section
+            id="calculator"
+            className="relative mx-4 mb-4 overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md md:mx-6 md:mb-6 md:p-8"
+          >
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,#d5c4bb_1px,transparent_1px),linear-gradient(to_bottom,#d5c4bb_1px,transparent_1px)] [background-size:22px_22px]" />
-            <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#E87C40]/12 to-transparent blur-2xl" />
+            <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,#65584f_1px,transparent_1px),linear-gradient(to_bottom,#65584f_1px,transparent_1px)] [background-size:24px_24px]" />
+            <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#E87C40]/18 to-transparent blur-2xl" />
           </div>
 
           <div className="relative z-10">
@@ -1338,8 +1316,8 @@ export default function App() {
             <div
               className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
                 banner.tone === "rate_limit"
-                  ? "border-[#F0BB96] bg-[#FFF4EA] text-[#85502D]"
-                  : "border-[#EED3C3] bg-[#FFF7F2] text-[#744B37]"
+                  ? "border-[#A75A32]/70 bg-[#2A1E17]/80 text-[#F1BC9A]"
+                  : "border-[#6A4B3D] bg-[#241A16]/85 text-[#D5B09B]"
               }`}
             >
               {banner.message}
@@ -1350,7 +1328,7 @@ export default function App() {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
                   htmlFor="repo-url"
                 >
                   GitHub repository URL (public)
@@ -1366,14 +1344,14 @@ export default function App() {
                     value={repoUrl}
                     onChange={(event) => setRepoUrl(event.target.value)}
                     placeholder="https://github.com/owner/repo"
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                    className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
                     required
                   />
                 </div>
               </div>
               <div>
                 <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
                   htmlFor="branch"
                 >
                   Branch (optional)
@@ -1389,14 +1367,14 @@ export default function App() {
                     value={branch}
                     onChange={(event) => setBranch(event.target.value)}
                     placeholder="Default branch"
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                    className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+              <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]">
                 Manual reduction mode
               </p>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.15fr_1fr_1fr]">
@@ -1408,23 +1386,23 @@ export default function App() {
                       type="button"
                       aria-pressed={isSelected}
                       onClick={() => setMode(card.key)}
-                      className={`cursor-pointer rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-300 hover:border-orange-300 active:scale-[0.98] ${
+                      className={`cursor-pointer rounded-xl border border-white/15 bg-[#10151c] p-4 text-left transition-all duration-300 hover:border-[#E87C40]/60 active:scale-[0.98] ${
                         isSelected
-                          ? "border-orange-500 bg-orange-50/50 ring-1 ring-orange-500 shadow-sm"
+                          ? "border-[#E87C40] bg-[#281E18] ring-1 ring-[#E87C40] shadow-[0_12px_24px_rgba(0,0,0,0.25)]"
                           : ""
                       }`}
                     >
-                      <p className="font-bold text-gray-900">{card.title}</p>
-                      <p className="text-2xl font-bold tracking-tight text-orange-600">
+                      <p className="font-bold text-[#F3EEEA]">{card.title}</p>
+                      <p className="text-2xl font-bold tracking-tight text-[#F1A67D]">
                         {card.percentLabel}
                       </p>
                     </button>
                   );
                 })}
               </div>
-              <div className="mt-3 h-24 rounded-lg bg-gray-50/70 px-4 py-3">
+              <div className="mt-3 h-24 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
                 <p
-                  className={`text-sm leading-relaxed text-gray-600 transition-opacity duration-300 ${
+                  className={`text-sm leading-relaxed text-[#B8ADA6] transition-opacity duration-300 ${
                     modeDescriptionVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
@@ -1435,7 +1413,7 @@ export default function App() {
 
             <div>
               <label
-                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
                 htmlFor="github-token"
               >
                 GitHub token (optional for higher API limits)
@@ -1453,7 +1431,7 @@ export default function App() {
                   value={githubToken}
                   onChange={(event) => setGithubToken(event.target.value)}
                   placeholder="Enter a valid PAT (kept local in this browser session)"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-3 pl-10 pr-4 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                  className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
                 />
               </div>
             </div>
@@ -1461,7 +1439,7 @@ export default function App() {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
                   htmlFor="include-paths"
                 >
                   Include paths (optional)
@@ -1471,12 +1449,12 @@ export default function App() {
                   value={includePathsInput}
                   onChange={(event) => setIncludePathsInput(event.target.value)}
                   placeholder="contracts/core, pkg/vault"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                  className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
                 />
               </div>
               <div>
                 <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
                   htmlFor="exclude-paths"
                 >
                   Exclude paths (optional)
@@ -1486,28 +1464,28 @@ export default function App() {
                   value={excludePathsInput}
                   onChange={(event) => setExcludePathsInput(event.target.value)}
                   placeholder="contracts/test, scripts, interfaces"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-4 py-3 text-[#3E2B26] outline-none transition placeholder:text-[#AC9F99] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/10"
+                  className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
                 />
               </div>
             </div>
 
-            <p className="text-xs text-[#8A786F]">
+            <p className="text-xs text-[#AFA39C]">
               Default scope exclusions are active (tests, interfaces, mocks,
               scripts, generated and vendor/build folders).
             </p>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 bg-gray-50/60 px-4 py-3">
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3">
               <input
                 type="checkbox"
                 checked={smartContractOnly}
                 onChange={(event) => setSmartContractOnly(event.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#E87C40] focus:ring-[#E87C40]/30"
+                className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#10151c] text-[#E87C40] focus:ring-[#E87C40]/30"
               />
               <span>
-                <span className="text-sm font-medium text-[#5E4A43]">
+                <span className="text-sm font-medium text-[#E6DFDA]">
                   Smart-contract-only mode (default on)
                 </span>
-                <span className="mt-1 block text-xs text-[#8A786F]">
+                <span className="mt-1 block text-xs text-[#AFA39C]">
                   Excludes the “Other” language bucket from in-scope LOC.
                   Recommended for pure protocol contract audit scoping.
                 </span>
@@ -1517,30 +1495,30 @@ export default function App() {
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#E87C40] to-[#CB5626] px-5 py-3 text-sm font-medium tracking-wide text-white shadow-[inset_0px_1px_0px_rgba(255,255,255,0.2)] transition duration-200 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#E87C40] to-[#CB5626] px-5 py-3 text-sm font-medium tracking-wide text-[#1C1411] shadow-[inset_0px_1px_0px_rgba(255,255,255,0.2)] transition duration-200 hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "Calculating..." : "Calculate My Savings"}
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-[#7E6F68]">{statusMessage}</p>
+          <p className="mt-4 text-sm text-[#B8ADA6]">{statusMessage}</p>
 
           {isLoading && (
-            <div className="mt-6 space-y-3 rounded-2xl border border-[#EAE0DB] bg-[#FDFBF9] p-5">
-              <div className="h-4 w-40 animate-pulse rounded bg-[#EDE3DE]" />
-              <div className="h-3 w-full animate-pulse rounded bg-[#EFE6E2]" />
-              <div className="h-3 w-10/12 animate-pulse rounded bg-[#EFE6E2]" />
-              <div className="h-8 w-full animate-pulse rounded-lg bg-[#ECE1DC]" />
-              <div className="h-8 w-4/5 animate-pulse rounded-lg bg-[#ECE1DC]" />
+            <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="h-4 w-40 animate-pulse rounded bg-white/10" />
+              <div className="h-3 w-full animate-pulse rounded bg-white/10" />
+              <div className="h-3 w-10/12 animate-pulse rounded bg-white/10" />
+              <div className="h-8 w-full animate-pulse rounded-lg bg-white/10" />
+              <div className="h-8 w-4/5 animate-pulse rounded-lg bg-white/10" />
             </div>
           )}
 
           {!isLoading && !result && (
-            <div className="mt-6 rounded-2xl border border-[#EAE0DB] bg-[#FCFAF8] px-5 py-4">
-              <p className="text-sm font-medium text-[#604E47]">
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+              <p className="text-sm font-medium text-[#F0EAE6]">
                 Awaiting repository input.
               </p>
-              <p className="mt-1 text-sm leading-relaxed text-[#7C6A62]">
+              <p className="mt-1 text-sm leading-relaxed text-[#B6ACA6]">
                 Add a public GitHub URL and run the estimate to generate scoped
                 review weeks, complexity modifiers, and Apex savings.
               </p>
@@ -1548,40 +1526,40 @@ export default function App() {
           )}
 
           {result && (
-            <div className="mt-8 border-t border-[#F1EAE6] pt-8">
+            <div className="mt-8 border-t border-white/10 pt-8">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-wide text-[#8C7A71]">
+                  <p className="text-sm font-semibold uppercase tracking-wide text-[#B5AAA3]">
                     Visual Comparison
                   </p>
-                  <p className="mt-1 text-sm text-[#7D6C64]">
+                  <p className="mt-1 text-sm text-[#AFA39C]">
                     {result.owner}/{result.repo} • Branch {result.branch}
                   </p>
                 </div>
 
                 <div>
-                  <div className="mb-2 flex items-center justify-between text-sm font-medium text-[#6D5C55]">
+                  <div className="mb-2 flex items-center justify-between text-sm font-medium text-[#D1C7C1]">
                     <span>Manual Review</span>
                     <span>
                       Est. {weekLabel(result.estimates.baselineCalendarWeeks)}
                     </span>
                   </div>
-                  <div className="h-4 w-full overflow-hidden rounded-lg bg-gradient-to-r from-[#F0EBE8] to-[#E5DEDA]">
+                  <div className="h-4 w-full overflow-hidden rounded-lg bg-[#1F262F]">
                     <div
-                      className="h-full origin-left rounded-lg bg-gradient-to-r from-[#CFC4BF] to-[#B5A9A4] transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
+                      className="h-full origin-left rounded-lg bg-gradient-to-r from-[#69727D] to-[#515B67] transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
                       style={{ transform: barsLoaded ? "scaleX(1)" : "scaleX(0)" }}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div className="mb-2 flex items-center justify-between text-sm font-medium text-[#6D5C55]">
+                  <div className="mb-2 flex items-center justify-between text-sm font-medium text-[#D1C7C1]">
                     <span>With Apex</span>
                     <span>
                       Est. {weekLabel(result.estimates.apexCalendarWeeks)}
                     </span>
                   </div>
-                  <div className="h-4 w-full overflow-hidden rounded-lg bg-[#F5EEEA]">
+                  <div className="h-4 w-full overflow-hidden rounded-lg bg-[#1F262F]">
                     <div style={{ width: `${apexBarWidth}%` }} className="h-full">
                       <div
                         className="h-full origin-left rounded-lg transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
@@ -1594,40 +1572,40 @@ export default function App() {
                   </div>
                 </div>
 
-                <p className="text-sm text-[#7B6A62]">
+                <p className="text-sm text-[#B7ADA7]">
                   Apex timeline uses a fixed 0.2-week buffer (~1 day) with{" "}
                   <span className="font-medium capitalize">{mode}</span> mode
                   applied.
                 </p>
               </div>
 
-              <div className="mt-5 rounded-xl border border-[#E6DDD9] bg-[#FBF8F6] p-4">
+              <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-[#5F4E47]">
+                  <p className="text-sm font-semibold text-[#E4DDD9]">
                     Complexity multiplier
                   </p>
-                  <p className="text-sm font-semibold text-[#3E2B26]">
+                  <p className="text-sm font-semibold text-[#F4EFEB]">
                     x{formatNumber(result.estimates.complexityMultiplier)}
                   </p>
                 </div>
-                <p className="mt-1 text-xs text-[#85746D]">
+                <p className="mt-1 text-xs text-[#B3A8A1]">
                   Base weeks before modifiers:{" "}
                   {formatNumber(result.estimates.baseWeeks)}
                 </p>
                 {result.complexity?.modifiers?.length ? (
-                  <ul className="mt-3 space-y-1.5 text-xs text-[#6F5D55]">
+                  <ul className="mt-3 space-y-1.5 text-xs text-[#C3B8B2]">
                     {result.complexity.modifiers.map((modifier) => (
                       <li key={modifier.label} className="flex flex-wrap gap-1">
                         <span className="font-medium">{modifier.label}</span>
-                        <span className="text-[#7D6A62]">
+                        <span className="text-[#BDAFA8]">
                           ({formatModifierImpact(modifier.impact)})
                         </span>
-                        <span className="text-[#8C7A72]">- {modifier.reason}</span>
+                        <span className="text-[#A89D96]">- {modifier.reason}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-xs text-[#8C7A72]">
+                  <p className="mt-3 text-xs text-[#A89D96]">
                     No complexity keyword modifiers detected.
                   </p>
                 )}
@@ -1650,11 +1628,11 @@ export default function App() {
 
               {Object.keys(result.scopeSummary.exclusionReasonCounts ?? {})
                 .length > 0 && (
-                <div className="mt-3 rounded-lg border border-[#EAE2DE] bg-[#FCFAF9] p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#8C7A72]">
+                <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#B7ACA5]">
                     Exclusion summary
                   </p>
-                  <ul className="mt-1.5 space-y-1 text-xs text-[#7A6961]">
+                  <ul className="mt-1.5 space-y-1 text-xs text-[#B6ACA5]">
                     {Object.entries(result.scopeSummary.exclusionReasonCounts)
                       .sort((a, b) => b[1] - a[1])
                       .slice(0, 4)
@@ -1682,7 +1660,7 @@ export default function App() {
                 />
               </div>
 
-              <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#8C7A72]">
+              <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#B7ACA5]">
                 Effective LOC breakdown (used in estimate)
               </p>
               <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -1705,11 +1683,11 @@ export default function App() {
                 />
               </div>
 
-              <div className="mt-7 rounded-xl border border-[#E8DFDB] bg-[#FBF9F8] p-5">
-                <p className="text-lg font-semibold text-[#3E2B26]">
+              <div className="mt-7 rounded-xl border border-[#3F2B23] bg-[#1A1411] p-5">
+                <p className="text-lg font-semibold text-[#F2E9E4]">
                   Ready to speed up your audit?
                 </p>
-                <button className="mt-4 rounded-lg border border-[#3E2B26] px-5 py-2.5 text-sm font-semibold text-[#3E2B26] transition hover:bg-[#3E2B26] hover:text-white">
+                <button className="mt-4 rounded-lg border border-[#E87C40]/60 px-5 py-2.5 text-sm font-semibold text-[#F4A27E] transition hover:bg-[#E87C40]/20 hover:text-[#F9C4A8] active:scale-[0.98]">
                   Start Your Scan Now
                 </button>
               </div>
@@ -1720,7 +1698,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setAssumptionsOpen((isOpen) => !isOpen)}
-              className="flex cursor-pointer items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-800"
+              className="flex cursor-pointer items-center gap-2 text-sm text-[#B5AAA3] transition-colors hover:text-[#F2ECE8]"
             >
               <CaretDown
                 size={16}
@@ -1732,7 +1710,7 @@ export default function App() {
               <span>How is this calculated?</span>
             </button>
             {assumptionsOpen && (
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#786860]">
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#B8ADA6]">
                 <li>Solidity: 1000 code LOC ≈ 1 week.</li>
                 <li>Rust + C/C++: 1500 code LOC ≈ 1 week.</li>
                 <li>Other: 2000 code LOC ≈ 1 week.</li>
@@ -1783,6 +1761,7 @@ export default function App() {
             )}
           </div>
           </div>
+        </section>
         </section>
       </main>
     </div>
