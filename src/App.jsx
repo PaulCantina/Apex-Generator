@@ -1102,149 +1102,163 @@ export default function App() {
     <div className="min-h-screen bg-apex-black text-white">
       <section className="relative min-h-screen overflow-hidden bg-hero">
         <div className="absolute inset-0 bg-noise opacity-5" />
-        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-apex-orange0/25 blur-3xl animate-[pulse_9s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute -right-24 bottom-24 h-80 w-80 rounded-full bg-apex-orange1/20 blur-3xl animate-[pulse_11s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-apex-black/20 to-apex-black" />
+        <div className="pointer-events-none absolute -left-32 top-6 h-96 w-96 rounded-full bg-apex-orange0/28 blur-3xl" />
+        <div className="pointer-events-none absolute -right-28 bottom-8 h-[26rem] w-[26rem] rounded-full bg-apex-orange1/24 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-apex-black/30 to-apex-black/75" />
 
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-8">
-          <header className="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl sm:px-6">
-            <a
-              href="/"
-              className="flex items-center transition-opacity duration-300 hover:opacity-80"
-            >
-              <CantinaLogo />
-            </a>
-            <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-apex-ink/70 p-1 text-sm text-white/65 md:flex">
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1340px] items-start px-4 pb-10 pt-5 sm:px-6 lg:px-8">
+          <div className="relative w-full overflow-hidden rounded-[32px] border border-white/10 bg-apex-ink/70 shadow-stage backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-white/10 to-transparent" />
+            <div className="pointer-events-none absolute -left-20 bottom-8 h-64 w-64 rounded-full bg-apex-orange0/10 blur-3xl" />
+            <div className="pointer-events-none absolute -right-8 top-12 h-72 w-72 rounded-full bg-apex-orange1/12 blur-3xl" />
+
+            <header className="relative flex items-center justify-between px-4 pt-4 sm:px-7 sm:pt-6">
               <a
-                href="https://cantina.xyz/solutions/code-analyzer/enterprise"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full bg-white/10 px-3 py-1.5 text-white/90 transition-colors duration-300 hover:bg-white/20"
+                href="/"
+                className="flex items-center transition-opacity duration-300 hover:opacity-85"
               >
-                Apex
+                <CantinaLogo />
               </a>
-              <a
-                href="#"
-                className="rounded-full px-3 py-1.5 transition-colors duration-300 hover:bg-white/10 hover:text-white"
-              >
-                Services
-              </a>
-              <a
-                href="#"
-                className="rounded-full px-3 py-1.5 transition-colors duration-300 hover:bg-white/10 hover:text-white"
-              >
-                Resources
-              </a>
-            </nav>
-          </header>
 
-          <main className="flex flex-1 items-center py-10 sm:py-14">
-            <section
-              id="calculator"
-              className="mx-auto w-full max-w-4xl rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-glow backdrop-blur-xl sm:p-10"
-            >
-              <span className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70">
-                <span className="h-2 w-2 rounded-full bg-gradient-to-br from-apex-orange0 to-apex-orange1 ring-4 ring-apex-orange0/20" />
-                Apex Impact Calculator
-              </span>
-
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-                One click to audit readiness
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm text-white/70 sm:text-base">
-                Estimate time to audit readiness with Apex, just one click away.
-              </p>
-
-              {banner && (
-                <div
-                  className={`mt-6 rounded-xl border px-4 py-3 text-sm ${
-                    banner.tone === "rate_limit"
-                      ? "border-apex-orange1/45 bg-apex-orange1/15 text-apex-orange1"
-                      : "border-white/20 bg-white/10 text-white/80"
-                  }`}
+              <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-apex-black/55 p-1 text-[13px] text-white/65 lg:flex">
+                <a
+                  href="https://cantina.xyz/solutions/code-analyzer/enterprise"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full bg-white/10 px-3 py-1.5 text-white/90 transition-colors duration-300 hover:bg-white/20"
                 >
-                  {banner.message}
-                </div>
-              )}
+                  Apex
+                </a>
+                <a
+                  href="#"
+                  className="rounded-full px-3 py-1.5 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+                >
+                  Services
+                </a>
+                <a
+                  href="#"
+                  className="rounded-full px-3 py-1.5 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+                >
+                  Resources
+                </a>
+              </nav>
 
-              <form className="mt-7 space-y-4" onSubmit={handleEstimate}>
-                <div>
+              <a
+                href="#"
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/85 transition-colors duration-300 hover:bg-white/10"
+              >
+                Create Account
+              </a>
+            </header>
+
+            <main className="relative flex items-center justify-center px-4 pb-12 pt-12 sm:px-8 sm:pt-16 lg:pb-20 lg:pt-20">
+              <section
+                id="calculator"
+                className="w-full max-w-4xl rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-glow backdrop-blur-xl sm:p-8 lg:p-10"
+              >
+                <span className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70">
+                  <span className="h-2 w-2 rounded-full bg-gradient-to-br from-apex-orange0 to-apex-orange1 ring-4 ring-apex-orange0/20" />
+                  Apex Impact Calculator
+                </span>
+
+                <h1 className="mt-6 max-w-[16ch] text-3xl font-semibold leading-[0.95] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  Estimate audit readiness in one click
+                </h1>
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
+                  Get a clear, LOC-based timeline for manual review and projected
+                  Apex acceleration in under a minute.
+                </p>
+
+                {banner && (
+                  <div
+                    className={`mt-6 rounded-xl border px-4 py-3 text-sm ${
+                      banner.tone === "rate_limit"
+                        ? "border-apex-orange1/45 bg-apex-orange1/15 text-apex-orange1"
+                        : "border-white/20 bg-white/10 text-white/80"
+                    }`}
+                  >
+                    {banner.message}
+                  </div>
+                )}
+
+                <form className="mt-8 space-y-3" onSubmit={handleEstimate}>
                   <label
-                    className="mb-2 block text-xs font-semibold uppercase tracking-[0.13em] text-white/55"
+                    className="block text-xs font-semibold uppercase tracking-[0.13em] text-white/55"
                     htmlFor="repo-url"
                   >
                     GitHub repository URL (public)
                   </label>
-                  <div className="relative">
-                    <GithubLogo
-                      size={18}
-                      weight="regular"
-                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50"
-                    />
-                    <input
-                      id="repo-url"
-                      value={repoUrl}
-                      onChange={(event) => setRepoUrl(event.target.value)}
-                      placeholder="https://github.com/owner/repo"
-                      className="w-full rounded-[14px] border border-white/15 bg-apex-ink/80 py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-white/40 focus:border-apex-orange0 focus:ring-2 focus:ring-apex-orange0/35"
-                      required
-                    />
+                  <div className="grid gap-3 md:grid-cols-[1fr_220px]">
+                    <div className="relative">
+                      <GithubLogo
+                        size={18}
+                        weight="regular"
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50"
+                      />
+                      <input
+                        id="repo-url"
+                        value={repoUrl}
+                        onChange={(event) => setRepoUrl(event.target.value)}
+                        placeholder="https://github.com/owner/repo"
+                        className="w-full rounded-[14px] border border-white/15 bg-apex-ink/80 py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-white/40 focus:border-apex-orange0 focus:ring-2 focus:ring-apex-orange0/35"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="rounded-[14px] bg-gradient-to-br from-apex-orange0 to-apex-orange1 px-5 py-3 font-semibold text-apex-black shadow-glow transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-65"
+                    >
+                      {isLoading ? "Calculating..." : "Calculate My Savings"}
+                    </button>
+                  </div>
+                </form>
+
+                <p className="mt-3 text-sm text-white/60">{statusMessage}</p>
+
+                <div className="mt-6 rounded-2xl border border-white/10 bg-apex-black/55 p-4">
+                  <p className="text-xs uppercase tracking-[0.14em] text-white/45">
+                    Estimate preview
+                  </p>
+                  <p className="mt-1 text-xs text-white/50">
+                    {result
+                      ? `${result.owner}/${result.repo} • ${result.branch}`
+                      : "Run an estimate to preview manual weeks, Apex weeks, and projected savings."}
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <p className="text-xs uppercase tracking-wide text-white/50">
+                        Manual
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-white">
+                        {result
+                          ? weekLabel(result.estimates.baselineCalendarWeeks)
+                          : "--"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <p className="text-xs uppercase tracking-wide text-white/50">
+                        With Apex
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-white">
+                        {result ? weekLabel(result.estimates.apexCalendarWeeks) : "--"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <p className="text-xs uppercase tracking-wide text-white/50">
+                        Saved
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-white">
+                        {result
+                          ? `${formatNumber(result.estimates.percentSaved)}%`
+                          : "--"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full rounded-[14px] bg-gradient-to-br from-apex-orange0 to-apex-orange1 py-3 font-semibold text-apex-black shadow-glow transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-65"
-                >
-                  {isLoading ? "Calculating..." : "Calculate My Savings"}
-                </button>
-              </form>
-
-              <p className="mt-3 text-sm text-white/60">{statusMessage}</p>
-
-              <div className="mt-6 rounded-2xl border border-white/10 bg-apex-black/55 p-4">
-                <p className="text-xs uppercase tracking-[0.14em] text-white/45">
-                  Estimate preview
-                </p>
-                <p className="mt-1 text-xs text-white/50">
-                  {result
-                    ? `${result.owner}/${result.repo} • ${result.branch}`
-                    : "Run an estimate to preview manual weeks, Apex weeks, and projected savings."}
-                </p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-xs uppercase tracking-wide text-white/50">
-                      Manual
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-white">
-                      {result
-                        ? weekLabel(result.estimates.baselineCalendarWeeks)
-                        : "--"}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-xs uppercase tracking-wide text-white/50">
-                      With Apex
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-white">
-                      {result ? weekLabel(result.estimates.apexCalendarWeeks) : "--"}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-xs uppercase tracking-wide text-white/50">
-                      Saved
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-white">
-                      {result
-                        ? `${formatNumber(result.estimates.percentSaved)}%`
-                        : "--"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </main>
+              </section>
+            </main>
+          </div>
         </div>
       </section>
 

@@ -14,6 +14,8 @@ export default {
       boxShadow: {
         glow:
           "0 20px 60px rgba(0, 0, 0, 0.5), 0 18px 55px rgba(255, 122, 47, 0.22)",
+        stage:
+          "0 40px 110px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
       },
       backgroundImage: {
         hero:
