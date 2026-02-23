@@ -1092,6 +1092,7 @@ export default function App() {
   const [smartContractOnly, setSmartContractOnly] = useState(true);
   const [mode, setMode] = useState("standard");
   const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState(
     "Enter a public GitHub repository URL to begin.",
@@ -1326,190 +1327,212 @@ export default function App() {
           )}
 
           <form className="space-y-4" onSubmit={handleEstimate}>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                  htmlFor="repo-url"
-                >
-                  GitHub repository URL (public)
-                </label>
-                <div className="relative">
-                  <GithubLogo
-                    size={16}
-                    weight="regular"
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    id="repo-url"
-                    value={repoUrl}
-                    onChange={(event) => setRepoUrl(event.target.value)}
-                    placeholder="https://github.com/owner/repo"
-                    className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                  htmlFor="branch"
-                >
-                  Branch (optional)
-                </label>
-                <div className="relative">
-                  <GitBranch
-                    size={16}
-                    weight="regular"
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    id="branch"
-                    value={branch}
-                    onChange={(event) => setBranch(event.target.value)}
-                    placeholder="Default branch"
-                    className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                  />
-                </div>
-              </div>
-            </div>
-
             <div>
-              <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]">
-                Manual reduction mode
-              </p>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.15fr_1fr_1fr]">
-                {MODE_SELECTION_CARDS.map((card) => {
-                  const isSelected = mode === card.key;
-                  return (
-                    <button
-                      key={card.key}
-                      type="button"
-                      aria-pressed={isSelected}
-                      onClick={() => setMode(card.key)}
-                      className={`cursor-pointer rounded-xl border border-white/15 bg-[#10151c] p-4 text-left transition-all duration-300 hover:border-[#E87C40]/60 active:scale-[0.98] ${
-                        isSelected
-                          ? "border-[#E87C40] bg-[#281E18] ring-1 ring-[#E87C40] shadow-[0_12px_24px_rgba(0,0,0,0.25)]"
-                          : ""
-                      }`}
-                    >
-                      <p className="font-bold text-[#F3EEEA]">{card.title}</p>
-                      <p className="text-2xl font-bold tracking-tight text-[#F1A67D]">
-                        {card.percentLabel}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-3 h-24 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
-                <p
-                  className={`text-sm leading-relaxed text-[#B8ADA6] transition-opacity duration-300 ${
-                    modeDescriptionVisible ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  {selectedModeCard.description}
-                </p>
+              <label
+                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                htmlFor="repo-url"
+              >
+                GitHub repository URL (public)
+              </label>
+              <div className="relative">
+                <GithubLogo
+                  size={16}
+                  weight="regular"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  id="repo-url"
+                  value={repoUrl}
+                  onChange={(event) => setRepoUrl(event.target.value)}
+                  placeholder="https://github.com/owner/repo"
+                  className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                  required
+                />
               </div>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/[0.02]">
               <button
                 type="button"
-                onClick={() => setAdvancedOpen((open) => !open)}
+                onClick={() => setCustomizeOpen((open) => !open)}
                 className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#C8BDB6] transition-colors hover:text-[#F2ECE8]"
               >
-                <span>Advanced scope controls</span>
+                <span>Customize estimate (branch, mode, scope)</span>
                 <CaretDown
                   size={16}
                   weight="regular"
                   className={`transition-transform duration-200 ${
-                    advancedOpen ? "rotate-180" : ""
+                    customizeOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
-              {advancedOpen && (
+              {customizeOpen && (
                 <div className="space-y-4 border-t border-white/10 px-4 pb-4 pt-4">
                   <div>
                     <label
                       className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                      htmlFor="github-token"
+                      htmlFor="branch"
                     >
-                      GitHub token (optional for higher API limits)
+                      Branch (optional)
                     </label>
                     <div className="relative">
-                      <Key
+                      <GitBranch
                         size={16}
                         weight="regular"
                         className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                       />
                       <input
-                        id="github-token"
-                        type="password"
-                        autoComplete="off"
-                        value={githubToken}
-                        onChange={(event) => setGithubToken(event.target.value)}
-                        placeholder="Enter a valid PAT (kept local in this browser session)"
+                        id="branch"
+                        value={branch}
+                        onChange={(event) => setBranch(event.target.value)}
+                        placeholder="Default branch"
                         className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
                       />
                     </div>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <label
-                        className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                        htmlFor="include-paths"
-                      >
-                        Include paths (optional)
-                      </label>
-                      <input
-                        id="include-paths"
-                        value={includePathsInput}
-                        onChange={(event) => setIncludePathsInput(event.target.value)}
-                        placeholder="contracts/core, pkg/vault"
-                        className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                      />
+                  <div>
+                    <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]">
+                      Manual reduction mode
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.15fr_1fr_1fr]">
+                      {MODE_SELECTION_CARDS.map((card) => {
+                        const isSelected = mode === card.key;
+                        return (
+                          <button
+                            key={card.key}
+                            type="button"
+                            aria-pressed={isSelected}
+                            onClick={() => setMode(card.key)}
+                            className={`cursor-pointer rounded-xl border border-white/15 bg-[#10151c] p-4 text-left transition-all duration-300 hover:border-[#E87C40]/60 active:scale-[0.98] ${
+                              isSelected
+                                ? "border-[#E87C40] bg-[#281E18] ring-1 ring-[#E87C40] shadow-[0_12px_24px_rgba(0,0,0,0.25)]"
+                                : ""
+                            }`}
+                          >
+                            <p className="font-bold text-[#F3EEEA]">{card.title}</p>
+                            <p className="text-2xl font-bold tracking-tight text-[#F1A67D]">
+                              {card.percentLabel}
+                            </p>
+                          </button>
+                        );
+                      })}
                     </div>
-                    <div>
-                      <label
-                        className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                        htmlFor="exclude-paths"
+                    <div className="mt-3 h-24 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
+                      <p
+                        className={`text-sm leading-relaxed text-[#B8ADA6] transition-opacity duration-300 ${
+                          modeDescriptionVisible ? "opacity-100" : "opacity-0"
+                        }`}
                       >
-                        Exclude paths (optional)
-                      </label>
-                      <input
-                        id="exclude-paths"
-                        value={excludePathsInput}
-                        onChange={(event) => setExcludePathsInput(event.target.value)}
-                        placeholder="contracts/test, scripts, interfaces"
-                        className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                      />
+                        {selectedModeCard.description}
+                      </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#AFA39C]">
-                    Default scope exclusions are active (tests, interfaces,
-                    mocks, scripts, generated and vendor/build folders).
-                  </p>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02]">
+                    <button
+                      type="button"
+                      onClick={() => setAdvancedOpen((open) => !open)}
+                      className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#C8BDB6] transition-colors hover:text-[#F2ECE8]"
+                    >
+                      <span>Advanced scope controls</span>
+                      <CaretDown
+                        size={16}
+                        weight="regular"
+                        className={`transition-transform duration-200 ${
+                          advancedOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={smartContractOnly}
-                      onChange={(event) => setSmartContractOnly(event.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#10151c] text-[#E87C40] focus:ring-[#E87C40]/30"
-                    />
-                    <span>
-                      <span className="text-sm font-medium text-[#E6DFDA]">
-                        Smart-contract-only mode (default on)
-                      </span>
-                      <span className="mt-1 block text-xs text-[#AFA39C]">
-                        Excludes the “Other” language bucket from in-scope LOC.
-                        Recommended for pure protocol contract audit scoping.
-                      </span>
-                    </span>
-                  </label>
+                    {advancedOpen && (
+                      <div className="space-y-4 border-t border-white/10 px-4 pb-4 pt-4">
+                        <div>
+                          <label
+                            className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                            htmlFor="github-token"
+                          >
+                            GitHub token (optional for higher API limits)
+                          </label>
+                          <div className="relative">
+                            <Key
+                              size={16}
+                              weight="regular"
+                              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            />
+                            <input
+                              id="github-token"
+                              type="password"
+                              autoComplete="off"
+                              value={githubToken}
+                              onChange={(event) => setGithubToken(event.target.value)}
+                              placeholder="Enter a valid PAT (kept local in this browser session)"
+                              className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div>
+                            <label
+                              className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                              htmlFor="include-paths"
+                            >
+                              Include paths (optional)
+                            </label>
+                            <input
+                              id="include-paths"
+                              value={includePathsInput}
+                              onChange={(event) => setIncludePathsInput(event.target.value)}
+                              placeholder="contracts/core, pkg/vault"
+                              className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                            />
+                          </div>
+                          <div>
+                            <label
+                              className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                              htmlFor="exclude-paths"
+                            >
+                              Exclude paths (optional)
+                            </label>
+                            <input
+                              id="exclude-paths"
+                              value={excludePathsInput}
+                              onChange={(event) => setExcludePathsInput(event.target.value)}
+                              placeholder="contracts/test, scripts, interfaces"
+                              className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                            />
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-[#AFA39C]">
+                          Default scope exclusions are active (tests,
+                          interfaces, mocks, scripts, generated and
+                          vendor/build folders).
+                        </p>
+
+                        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={smartContractOnly}
+                            onChange={(event) => setSmartContractOnly(event.target.checked)}
+                            className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#10151c] text-[#E87C40] focus:ring-[#E87C40]/30"
+                          />
+                          <span>
+                            <span className="text-sm font-medium text-[#E6DFDA]">
+                              Smart-contract-only mode (default on)
+                            </span>
+                            <span className="mt-1 block text-xs text-[#AFA39C]">
+                              Excludes the “Other” language bucket from in-scope
+                              LOC. Recommended for pure protocol contract audit
+                              scoping.
+                            </span>
+                          </span>
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
