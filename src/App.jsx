@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  ChevronDown,
+  CaretDown,
   GitBranch,
-  Github,
-  KeyRound,
-} from "lucide-react";
+  GithubLogo,
+  Key,
+  Pulse,
+  ShieldCheck,
+  Timer,
+} from "@phosphor-icons/react";
 import cantinaLogomark from "./assets/cantina-logomark-color-dark.svg";
 
 const PRIMARY_GRADIENT = "linear-gradient(to right, #E87C40, #CB5626)";
@@ -991,7 +994,7 @@ function CantinaLogo() {
         className="h-8 w-8"
         loading="eager"
       />
-      <span className="text-base font-semibold text-gray-900">Cantina</span>
+      <span className="text-base font-semibold text-[#2D2521]">Cantina</span>
     </span>
   );
 }
@@ -999,7 +1002,7 @@ function CantinaLogo() {
 function FloatingNavbar() {
   return (
     <div className="fixed inset-x-0 top-4 z-50 px-3 sm:px-6">
-      <nav className="mx-auto h-16 w-full max-w-5xl rounded-full border border-white/20 bg-white/70 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl">
+      <nav className="mx-auto h-16 w-full max-w-7xl rounded-full border border-white/30 bg-white/75 shadow-[0_8px_30px_rgba(72,43,28,0.08)] backdrop-blur-xl">
         <div className="relative flex h-full items-center justify-between px-4 sm:px-6">
           <a
             href="/"
@@ -1013,19 +1016,19 @@ function FloatingNavbar() {
               href="https://cantina.xyz/solutions/code-analyzer/enterprise"
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-all duration-300"
+              className="rounded-full bg-[#E87C40]/12 px-3 py-1 text-sm font-medium text-[#A04B24] transition-all duration-300"
             >
               Apex
             </a>
             <a
               href="#"
-              className="px-3 py-1 text-sm font-medium text-gray-500 transition-all duration-300 hover:text-gray-900"
+              className="px-3 py-1 text-sm font-medium text-[#7D6D66] transition-all duration-300 hover:text-[#2D2521]"
             >
               Services
             </a>
             <a
               href="#"
-              className="px-3 py-1 text-sm font-medium text-gray-500 transition-all duration-300 hover:text-gray-900"
+              className="px-3 py-1 text-sm font-medium text-[#7D6D66] transition-all duration-300 hover:text-[#2D2521]"
             >
               Resources
             </a>
@@ -1034,13 +1037,13 @@ function FloatingNavbar() {
           <div className="ml-auto flex items-center gap-3">
             <a
               href="#"
-              className="hidden text-sm font-medium text-gray-600 transition-all duration-300 hover:text-black sm:inline-flex"
+              className="hidden text-sm font-medium text-[#74645D] transition-all duration-300 hover:text-[#2D2521] sm:inline-flex"
             >
               Login
             </a>
             <a
               href="#calculator"
-              className="shimmer-button inline-flex items-center rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-black"
+              className="shimmer-button inline-flex items-center rounded-full bg-[#2D2521] px-5 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-[#3A2F29] active:scale-[0.98]"
             >
               <span className="relative z-10">Run a Scan</span>
             </a>
@@ -1256,36 +1259,78 @@ export default function App() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white text-[#3E2B26]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 opacity-5 [background-image:radial-gradient(#7b3515_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      <div className="pointer-events-none absolute -right-32 -top-44 h-[34rem] w-[34rem] rounded-full bg-gradient-to-tr from-[#FF6B35]/10 to-transparent blur-3xl" />
+    <div className="relative min-h-[100dvh] overflow-hidden bg-[#f9f8f6] text-[#3E2B26]">
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-80 opacity-[0.06] [background-image:radial-gradient(#8c715f_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,rgba(62,43,38,1),rgba(62,43,38,0))]" />
+      <div className="pointer-events-none absolute -right-28 -top-40 h-[32rem] w-[32rem] rounded-full bg-gradient-to-tr from-[#F4A27E]/20 via-[#E87C40]/12 to-transparent blur-3xl" />
 
       <FloatingNavbar />
 
-      <main className="relative z-10 mx-auto w-full max-w-4xl px-6 pb-20 pt-32 md:pt-36">
-        <section className="mx-auto max-w-3xl text-center">
-          <div className="mb-4">
-            <span className="inline-flex items-center rounded-full bg-[#E87C40]/10 px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#CB5626]">
+      <main className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-28 sm:px-6 md:pt-36 lg:px-8">
+        <section className="grid items-end gap-10 md:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-6">
+            <span className="inline-flex items-center rounded-full border border-[#E0C9BD] bg-[#FFF4ED] px-4 py-1.5 text-xs font-semibold tracking-[0.14em] text-[#A45028]">
               APEX SECURITY IMPACT
             </span>
+            <h1 className="max-w-[16ch] text-4xl font-semibold leading-none tracking-tighter text-[#2E2521] md:text-6xl">
+              Accelerate Your Audit Readiness
+            </h1>
+            <p className="max-w-[62ch] text-base leading-relaxed text-[#6D5E57]">
+              Estimate in-scope security review weeks with stricter audit
+              filtering and calibrated code-line counting. The model excludes
+              tests, interface-heavy files, and non-audit packages by default.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-[#6D5E57]">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#E5D6CF] bg-white/80 px-3 py-1.5">
+                <ShieldCheck size={16} weight="regular" className="text-[#A45028]" />
+                Scope-safe defaults
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#E5D6CF] bg-white/80 px-3 py-1.5">
+                <Timer size={16} weight="regular" className="text-[#A45028]" />
+                0.2 week Apex buffer
+              </span>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-[#3E2B26]">
-            Accelerate Your Audit Readiness
-          </h1>
-          <p className="mt-4 text-lg text-[#7C6D66]">
-            See how Cantina Apex reduces manual security review time by up to
-            50%. Enter your repo to estimate your savings.
-          </p>
+
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-[#E9DDD7] bg-white/90 p-8 shadow-[0_20px_40px_-15px_rgba(72,43,28,0.08)]">
+            <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,#cdb5a8_1px,transparent_1px),linear-gradient(to_bottom,#cdb5a8_1px,transparent_1px)] [background-size:22px_22px]" />
+            <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-tr from-[#E87C40]/16 to-transparent blur-2xl" />
+            <div className="relative space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8E7567]">
+                Live model behavior
+              </p>
+              <div className="space-y-3 rounded-2xl border border-[#E9DDD7] bg-[#FDFBF9] p-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[#725E55]">Audit scope calibration</span>
+                  <span className="font-medium text-[#2E2521]">Active</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-[#EADFD9]">
+                  <div className="h-full w-[78%] rounded-full bg-[linear-gradient(to_right,#F4A27E,#E87C40,#CB5626,#8F431D)]" />
+                </div>
+              </div>
+              <div className="space-y-3 rounded-2xl border border-[#E9DDD7] bg-[#FDFBF9] p-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[#725E55]">Estimator response</span>
+                  <span className="inline-flex items-center gap-1 font-medium text-[#2E2521]">
+                    <Pulse size={14} weight="bold" className="animate-pulse text-[#A45028]" />
+                    Stable
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed text-[#7B6860]">
+                  Mode-adjusted output with complexity multipliers and SLOC
+                  filtering for audit-scope realism.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section
           id="calculator"
-          className="relative mt-10 overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+          className="relative mt-12 overflow-hidden rounded-[2.5rem] border border-[#ECE1DB] bg-white p-8 shadow-[0_20px_40px_-15px_rgba(72,43,28,0.08)]"
         >
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,#d8dde6_1px,transparent_1px),linear-gradient(to_bottom,#d8dde6_1px,transparent_1px)] [background-size:22px_22px]" />
+            <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,#d5c4bb_1px,transparent_1px),linear-gradient(to_bottom,#d5c4bb_1px,transparent_1px)] [background-size:22px_22px]" />
             <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#E87C40]/12 to-transparent blur-2xl" />
-            <div className="absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-[#9CB6FF]/10 to-transparent blur-2xl" />
           </div>
 
           <div className="relative z-10">
@@ -1311,7 +1356,11 @@ export default function App() {
                   GitHub repository URL (public)
                 </label>
                 <div className="relative">
-                  <Github className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <GithubLogo
+                    size={16}
+                    weight="regular"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
                   <input
                     id="repo-url"
                     value={repoUrl}
@@ -1330,7 +1379,11 @@ export default function App() {
                   Branch (optional)
                 </label>
                 <div className="relative">
-                  <GitBranch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <GitBranch
+                    size={16}
+                    weight="regular"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
                   <input
                     id="branch"
                     value={branch}
@@ -1346,7 +1399,7 @@ export default function App() {
               <p className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                 Manual reduction mode
               </p>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.15fr_1fr_1fr]">
                 {MODE_SELECTION_CARDS.map((card) => {
                   const isSelected = mode === card.key;
                   return (
@@ -1355,7 +1408,7 @@ export default function App() {
                       type="button"
                       aria-pressed={isSelected}
                       onClick={() => setMode(card.key)}
-                      className={`cursor-pointer rounded-xl border border-gray-200 bg-white p-4 text-left transition-all hover:border-orange-300 ${
+                      className={`cursor-pointer rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-300 hover:border-orange-300 active:scale-[0.98] ${
                         isSelected
                           ? "border-orange-500 bg-orange-50/50 ring-1 ring-orange-500 shadow-sm"
                           : ""
@@ -1388,7 +1441,11 @@ export default function App() {
                 GitHub token (optional for higher API limits)
               </label>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Key
+                  size={16}
+                  weight="regular"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   id="github-token"
                   type="password"
@@ -1468,6 +1525,28 @@ export default function App() {
 
           <p className="mt-4 text-sm text-[#7E6F68]">{statusMessage}</p>
 
+          {isLoading && (
+            <div className="mt-6 space-y-3 rounded-2xl border border-[#EAE0DB] bg-[#FDFBF9] p-5">
+              <div className="h-4 w-40 animate-pulse rounded bg-[#EDE3DE]" />
+              <div className="h-3 w-full animate-pulse rounded bg-[#EFE6E2]" />
+              <div className="h-3 w-10/12 animate-pulse rounded bg-[#EFE6E2]" />
+              <div className="h-8 w-full animate-pulse rounded-lg bg-[#ECE1DC]" />
+              <div className="h-8 w-4/5 animate-pulse rounded-lg bg-[#ECE1DC]" />
+            </div>
+          )}
+
+          {!isLoading && !result && (
+            <div className="mt-6 rounded-2xl border border-[#EAE0DB] bg-[#FCFAF8] px-5 py-4">
+              <p className="text-sm font-medium text-[#604E47]">
+                Awaiting repository input.
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-[#7C6A62]">
+                Add a public GitHub URL and run the estimate to generate scoped
+                review weeks, complexity modifiers, and Apex savings.
+              </p>
+            </div>
+          )}
+
           {result && (
             <div className="mt-8 border-t border-[#F1EAE6] pt-8">
               <div className="space-y-4">
@@ -1489,8 +1568,8 @@ export default function App() {
                   </div>
                   <div className="h-4 w-full overflow-hidden rounded-lg bg-gradient-to-r from-[#F0EBE8] to-[#E5DEDA]">
                     <div
-                      className="h-full rounded-lg bg-gradient-to-r from-[#CFC4BF] to-[#B5A9A4] transition-[width] duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
-                      style={{ width: barsLoaded ? "100%" : "0%" }}
+                      className="h-full origin-left rounded-lg bg-gradient-to-r from-[#CFC4BF] to-[#B5A9A4] transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
+                      style={{ transform: barsLoaded ? "scaleX(1)" : "scaleX(0)" }}
                     />
                   </div>
                 </div>
@@ -1503,13 +1582,15 @@ export default function App() {
                     </span>
                   </div>
                   <div className="h-4 w-full overflow-hidden rounded-lg bg-[#F5EEEA]">
-                    <div
-                      className="h-full rounded-lg transition-[width] duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
-                      style={{
-                        width: barsLoaded ? `${apexBarWidth}%` : "0%",
-                        backgroundImage: PRIMARY_GRADIENT,
-                      }}
-                    />
+                    <div style={{ width: `${apexBarWidth}%` }} className="h-full">
+                      <div
+                        className="h-full origin-left rounded-lg transition-transform duration-1000 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)]"
+                        style={{
+                          transform: barsLoaded ? "scaleX(1)" : "scaleX(0)",
+                          backgroundImage: PRIMARY_GRADIENT,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1552,7 +1633,7 @@ export default function App() {
                 )}
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
                 <StatCard
                   label="Raw LOC scanned"
                   value={formatNumber(result.scopeSummary.rawTotalLoc, 0)}
@@ -1586,7 +1667,7 @@ export default function App() {
                 </div>
               )}
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
                 <StatCard
                   label="Weeks saved"
                   value={formatNumber(result.estimates.weeksSaved)}
@@ -1641,8 +1722,10 @@ export default function App() {
               onClick={() => setAssumptionsOpen((isOpen) => !isOpen)}
               className="flex cursor-pointer items-center gap-2 text-sm text-gray-500 transition-colors hover:text-gray-800"
             >
-              <ChevronDown
-                className={`h-4 w-4 transition-transform duration-200 ${
+              <CaretDown
+                size={16}
+                weight="regular"
+                className={`transition-transform duration-200 ${
                   assumptionsOpen ? "rotate-180" : ""
                 }`}
               />
