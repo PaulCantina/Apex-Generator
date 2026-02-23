@@ -1092,6 +1092,7 @@ export default function App() {
   const [smartContractOnly, setSmartContractOnly] = useState(true);
   const [mode, setMode] = useState("standard");
   const [modeDescriptionVisible, setModeDescriptionVisible] = useState(true);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState(
     "Enter a public GitHub repository URL to begin.",
   );
@@ -1411,86 +1412,107 @@ export default function App() {
               </div>
             </div>
 
-            <div>
-              <label
-                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                htmlFor="github-token"
+            <div className="rounded-xl border border-white/10 bg-white/[0.02]">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((open) => !open)}
+                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#C8BDB6] transition-colors hover:text-[#F2ECE8]"
               >
-                GitHub token (optional for higher API limits)
-              </label>
-              <div className="relative">
-                <Key
+                <span>Advanced scope controls</span>
+                <CaretDown
                   size={16}
                   weight="regular"
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className={`transition-transform duration-200 ${
+                    advancedOpen ? "rotate-180" : ""
+                  }`}
                 />
-                <input
-                  id="github-token"
-                  type="password"
-                  autoComplete="off"
-                  value={githubToken}
-                  onChange={(event) => setGithubToken(event.target.value)}
-                  placeholder="Enter a valid PAT (kept local in this browser session)"
-                  className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                />
-              </div>
+              </button>
+
+              {advancedOpen && (
+                <div className="space-y-4 border-t border-white/10 px-4 pb-4 pt-4">
+                  <div>
+                    <label
+                      className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                      htmlFor="github-token"
+                    >
+                      GitHub token (optional for higher API limits)
+                    </label>
+                    <div className="relative">
+                      <Key
+                        size={16}
+                        weight="regular"
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
+                      <input
+                        id="github-token"
+                        type="password"
+                        autoComplete="off"
+                        value={githubToken}
+                        onChange={(event) => setGithubToken(event.target.value)}
+                        placeholder="Enter a valid PAT (kept local in this browser session)"
+                        className="w-full rounded-lg border border-white/15 bg-[#10151c] py-3 pl-10 pr-4 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label
+                        className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                        htmlFor="include-paths"
+                      >
+                        Include paths (optional)
+                      </label>
+                      <input
+                        id="include-paths"
+                        value={includePathsInput}
+                        onChange={(event) => setIncludePathsInput(event.target.value)}
+                        placeholder="contracts/core, pkg/vault"
+                        className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
+                        htmlFor="exclude-paths"
+                      >
+                        Exclude paths (optional)
+                      </label>
+                      <input
+                        id="exclude-paths"
+                        value={excludePathsInput}
+                        onChange={(event) => setExcludePathsInput(event.target.value)}
+                        placeholder="contracts/test, scripts, interfaces"
+                        className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-[#AFA39C]">
+                    Default scope exclusions are active (tests, interfaces,
+                    mocks, scripts, generated and vendor/build folders).
+                  </p>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={smartContractOnly}
+                      onChange={(event) => setSmartContractOnly(event.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#10151c] text-[#E87C40] focus:ring-[#E87C40]/30"
+                    />
+                    <span>
+                      <span className="text-sm font-medium text-[#E6DFDA]">
+                        Smart-contract-only mode (default on)
+                      </span>
+                      <span className="mt-1 block text-xs text-[#AFA39C]">
+                        Excludes the “Other” language bucket from in-scope LOC.
+                        Recommended for pure protocol contract audit scoping.
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              )}
             </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                  htmlFor="include-paths"
-                >
-                  Include paths (optional)
-                </label>
-                <input
-                  id="include-paths"
-                  value={includePathsInput}
-                  onChange={(event) => setIncludePathsInput(event.target.value)}
-                  placeholder="contracts/core, pkg/vault"
-                  className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                />
-              </div>
-              <div>
-                <label
-                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#AFA39C]"
-                  htmlFor="exclude-paths"
-                >
-                  Exclude paths (optional)
-                </label>
-                <input
-                  id="exclude-paths"
-                  value={excludePathsInput}
-                  onChange={(event) => setExcludePathsInput(event.target.value)}
-                  placeholder="contracts/test, scripts, interfaces"
-                  className="w-full rounded-lg border border-white/15 bg-[#10151c] px-4 py-3 text-[#F2ECE8] outline-none transition placeholder:text-[#7E746E] focus:border-[#E87C40] focus:ring-4 focus:ring-[#E87C40]/20"
-                />
-              </div>
-            </div>
-
-            <p className="text-xs text-[#AFA39C]">
-              Default scope exclusions are active (tests, interfaces, mocks,
-              scripts, generated and vendor/build folders).
-            </p>
-
-            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3">
-              <input
-                type="checkbox"
-                checked={smartContractOnly}
-                onChange={(event) => setSmartContractOnly(event.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#10151c] text-[#E87C40] focus:ring-[#E87C40]/30"
-              />
-              <span>
-                <span className="text-sm font-medium text-[#E6DFDA]">
-                  Smart-contract-only mode (default on)
-                </span>
-                <span className="mt-1 block text-xs text-[#AFA39C]">
-                  Excludes the “Other” language bucket from in-scope LOC.
-                  Recommended for pure protocol contract audit scoping.
-                </span>
-              </span>
-            </label>
 
             <button
               type="submit"
@@ -1579,7 +1601,39 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
+                <StatCard
+                  label="Weeks saved"
+                  value={formatNumber(result.estimates.weeksSaved)}
+                />
+                <StatCard
+                  label="Apex estimate (weeks)"
+                  value={formatNumber(result.estimates.apexWeeks)}
+                />
+                <StatCard
+                  label="Percent saved"
+                  value={`${formatNumber(result.estimates.percentSaved)}%`}
+                />
+              </div>
+
+              <div className="mt-7 rounded-xl border border-[#3F2B23] bg-[#1A1411] p-5">
+                <p className="text-lg font-semibold text-[#F2E9E4]">
+                  Ready to speed up your audit?
+                </p>
+                <button className="mt-4 rounded-lg border border-[#E87C40]/60 px-5 py-2.5 text-sm font-semibold text-[#F4A27E] transition hover:bg-[#E87C40]/20 hover:text-[#F9C4A8] active:scale-[0.98]">
+                  Start Your Scan Now
+                </button>
+              </div>
+            </div>
+          )}
+          </div>
+        </section>
+        </section>
+
+        {result && (
+          <section className="mt-8 grid gap-6 md:grid-cols-[1.15fr_0.85fr]">
+            <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-[#E4DDD9]">
                     Complexity multiplier
@@ -1611,7 +1665,7 @@ export default function App() {
                 )}
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
                 <StatCard
                   label="Raw LOC scanned"
                   value={formatNumber(result.scopeSummary.rawTotalLoc, 0)}
@@ -1645,21 +1699,6 @@ export default function App() {
                 </div>
               )}
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr]">
-                <StatCard
-                  label="Weeks saved"
-                  value={formatNumber(result.estimates.weeksSaved)}
-                />
-                <StatCard
-                  label="Apex estimate (weeks)"
-                  value={formatNumber(result.estimates.apexWeeks)}
-                />
-                <StatCard
-                  label="Percent saved"
-                  value={`${formatNumber(result.estimates.percentSaved)}%`}
-                />
-              </div>
-
               <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#B7ACA5]">
                 Effective LOC breakdown (used in estimate)
               </p>
@@ -1682,87 +1721,77 @@ export default function App() {
                   value={result.locBreakdown.other}
                 />
               </div>
-
-              <div className="mt-7 rounded-xl border border-[#3F2B23] bg-[#1A1411] p-5">
-                <p className="text-lg font-semibold text-[#F2E9E4]">
-                  Ready to speed up your audit?
-                </p>
-                <button className="mt-4 rounded-lg border border-[#E87C40]/60 px-5 py-2.5 text-sm font-semibold text-[#F4A27E] transition hover:bg-[#E87C40]/20 hover:text-[#F9C4A8] active:scale-[0.98]">
-                  Start Your Scan Now
-                </button>
-              </div>
             </div>
-          )}
 
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => setAssumptionsOpen((isOpen) => !isOpen)}
-              className="flex cursor-pointer items-center gap-2 text-sm text-[#B5AAA3] transition-colors hover:text-[#F2ECE8]"
-            >
-              <CaretDown
-                size={16}
-                weight="regular"
-                className={`transition-transform duration-200 ${
-                  assumptionsOpen ? "rotate-180" : ""
-                }`}
-              />
-              <span>How is this calculated?</span>
-            </button>
-            {assumptionsOpen && (
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#B8ADA6]">
-                <li>Solidity: 1000 code LOC ≈ 1 week.</li>
-                <li>Rust + C/C++: 1500 code LOC ≈ 1 week.</li>
-                <li>Other: 2000 code LOC ≈ 1 week.</li>
-                <li>
-                  LOC counting excludes blank lines and comment-only lines where
-                  supported.
-                </li>
-                <li>
-                  Effective LOC excludes tests, interfaces, mocks, scripts, and
-                  generated/vendor/build directories by default.
-                </li>
-                <li>
-                  Optional include/exclude path filters can further narrow audit
-                  scope.
-                </li>
-                <li>
-                  Smart-contract-only mode excludes the entire “Other” bucket
-                  from in-scope LOC.
-                </li>
-                <li>
-                  Complexity multiplier starts at 1.0 and modifies the estimate:
-                  Final Weeks = Base Weeks × complexityMultiplier.
-                </li>
-                <li>
-                  Assembly/unsafe penalty: +0.20 if Solidity <code>assembly</code>
-                  or Rust <code>unsafe</code> appears in more than 2 files.
-                </li>
-                <li>
-                  Upgradability tax: +0.10 if any of <code>delegatecall</code>,{" "}
-                  <code>fallback</code>, <code>UUPS</code>, or{" "}
-                  <code>TransparentUpgradeableProxy</code> is detected in
-                  Solidity.
-                </li>
-                <li>
-                  OpenZeppelin discount: -0.15 if OpenZeppelin is detected in{" "}
-                  <code>package.json</code> dependencies or Solidity imports.
-                </li>
-                <li>Apex timeline adds a fixed 0.2-week buffer (~1 day).</li>
-                <li>
-                  Mode reductions for manual review: Conservative 20%, Standard
-                  35%, Strong 50%.
-                </li>
-                <li>
-                  LOC-based estimation only. No vulnerability detection or
-                  catch-rate claims are included.
-                </li>
-              </ul>
-            )}
-          </div>
-          </div>
-        </section>
-        </section>
+            <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6">
+              <button
+                type="button"
+                onClick={() => setAssumptionsOpen((isOpen) => !isOpen)}
+                className="flex cursor-pointer items-center gap-2 text-sm text-[#B5AAA3] transition-colors hover:text-[#F2ECE8]"
+              >
+                <CaretDown
+                  size={16}
+                  weight="regular"
+                  className={`transition-transform duration-200 ${
+                    assumptionsOpen ? "rotate-180" : ""
+                  }`}
+                />
+                <span>How is this calculated?</span>
+              </button>
+              {assumptionsOpen && (
+                <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[#B8ADA6]">
+                  <li>Solidity: 1000 code LOC ≈ 1 week.</li>
+                  <li>Rust + C/C++: 1500 code LOC ≈ 1 week.</li>
+                  <li>Other: 2000 code LOC ≈ 1 week.</li>
+                  <li>
+                    LOC counting excludes blank lines and comment-only lines
+                    where supported.
+                  </li>
+                  <li>
+                    Effective LOC excludes tests, interfaces, mocks, scripts,
+                    and generated/vendor/build directories by default.
+                  </li>
+                  <li>
+                    Optional include/exclude path filters can further narrow
+                    audit scope.
+                  </li>
+                  <li>
+                    Smart-contract-only mode excludes the entire “Other” bucket
+                    from in-scope LOC.
+                  </li>
+                  <li>
+                    Complexity multiplier starts at 1.0 and modifies the
+                    estimate: Final Weeks = Base Weeks × complexityMultiplier.
+                  </li>
+                  <li>
+                    Assembly/unsafe penalty: +0.20 if Solidity{" "}
+                    <code>assembly</code> or Rust <code>unsafe</code> appears in
+                    more than 2 files.
+                  </li>
+                  <li>
+                    Upgradability tax: +0.10 if any of <code>delegatecall</code>,{" "}
+                    <code>fallback</code>, <code>UUPS</code>, or{" "}
+                    <code>TransparentUpgradeableProxy</code> is detected in
+                    Solidity.
+                  </li>
+                  <li>
+                    OpenZeppelin discount: -0.15 if OpenZeppelin is detected in{" "}
+                    <code>package.json</code> dependencies or Solidity imports.
+                  </li>
+                  <li>Apex timeline adds a fixed 0.2-week buffer (~1 day).</li>
+                  <li>
+                    Mode reductions for manual review: Conservative 20%,
+                    Standard 35%, Strong 50%.
+                  </li>
+                  <li>
+                    LOC-based estimation only. No vulnerability detection or
+                    catch-rate claims are included.
+                  </li>
+                </ul>
+              )}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
